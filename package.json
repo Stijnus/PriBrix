@@ -7,6 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "import:sets": "npx tsx scripts/import-sets/index.ts",
     "lint": "eslint . --ext .ts,.tsx,.js",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write ."
@@ -40,11 +41,13 @@
     "zod": "^4.1.8"
   },
   "devDependencies": {
+    "@types/node": "^24.6.0",
     "@types/react": "~19.1.0",
     "eslint": "^9.38.0",
     "eslint-config-expo": "^10.0.0",
     "prettier": "^3.6.2",
     "react-test-renderer": "19.1.0",
+    "tsx": "^4.20.6",
     "typescript": "~5.9.2"
   },
   "private": true
