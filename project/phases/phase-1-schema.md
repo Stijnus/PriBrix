@@ -140,10 +140,10 @@
 
 ## Verification
 
-- [ ] Run all migrations against local Supabase — no SQL errors
-- [ ] Verify anon can SELECT from `sets`, `retailers`, `set_best_prices_daily`
-- [ ] Verify anon CANNOT INSERT into `watchlists`
-- [ ] Verify authenticated user can CRUD their own watchlists
-- [ ] Verify authenticated user CANNOT see another user's watchlists
-- [ ] Verify seed data appears in retailers table
-- [ ] Verify `set_offers_with_latest` view returns expected columns
+- [x] Run all migrations against Supabase — no SQL errors (applied to remote: zecyfmxxbuwyhjyehmdq)
+- [x] Verify anon can SELECT from `sets`, `retailers`, `set_best_prices_daily`
+- [x] Verify anon CANNOT INSERT into `watchlists`
+- [x] Verify authenticated user can CRUD their own watchlists
+- [x] Verify authenticated user CANNOT see another user's watchlists
+- [x] Verify seed data appears in retailers table (6 retailers: BE + NL)
+- [x] Verify `set_offers_with_latest` view returns expected columns (14 columns confirmed)
