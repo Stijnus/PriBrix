@@ -8,11 +8,11 @@
 
 ## 1. Core Tables Migration
 
-- [ ] Create `supabase/migrations/00001_extensions_and_utils.sql`:
+- [x] Create `supabase/migrations/00001_extensions_and_utils.sql`:
   - Enable `pgcrypto` extension
   - Enable `pg_trgm` extension (for fuzzy text search)
   - Create `set_updated_at()` trigger function
-- [ ] Create `supabase/migrations/00002_core_tables.sql`:
+- [x] Create `supabase/migrations/00002_core_tables.sql`:
   - **`sets`** table:
     - Fields: id (uuid PK), set_num (text unique), name, theme, year, image_url, msrp_eur, created_at, updated_at
     - Indexes: set_num unique, name trigram (gin), theme, year
@@ -36,7 +36,7 @@
 
 ## 2. Views
 
-- [ ] Create `supabase/migrations/00003_views.sql`:
+- [x] Create `supabase/migrations/00003_views.sql`:
   - **`offer_latest_snapshot`** view:
     - DISTINCT ON (offer_id) from price_snapshots ordered by captured_at DESC
     - Calculates delivered_price_calc = price + coalesce(shipping, 0)
@@ -47,7 +47,7 @@
 
 ## 3. User Tables Migration
 
-- [ ] Create `supabase/migrations/00004_user_tables.sql`:
+- [x] Create `supabase/migrations/00004_user_tables.sql`:
   - **`watchlists`** table:
     - Fields: id (uuid PK), user_id (FK auth.users), set_id (FK), country (BE|NL|*), created_at, updated_at
     - Unique: (user_id, set_id, country)
@@ -76,7 +76,7 @@
 
 ## 4. Ops / Matching Tables
 
-- [ ] Create `supabase/migrations/00005_ops_tables.sql`:
+- [x] Create `supabase/migrations/00005_ops_tables.sql`:
   - **`match_queue`** table:
     - Fields: id (uuid PK), retailer_id (FK), source_product_id, title_raw, ean, suggested_set_id (FK nullable), status (open|resolved|ignored), resolved_by, resolved_at, created_at
     - Indexes: status, retailer_id
@@ -94,7 +94,7 @@
 
 ## 5. RLS Policies
 
-- [ ] Create `supabase/migrations/00006_rls_policies.sql`:
+- [x] Create `supabase/migrations/00006_rls_policies.sql`:
   - **Public read** (SELECT for all):
     - `sets`
     - `retailers`
@@ -121,17 +121,17 @@
 
 ## 6. Seed Data
 
-- [ ] Create `supabase/seed/seed_retailers.sql`:
+- [x] Create `supabase/seed/seed_retailers.sql`:
   - Insert BE retailers: bol.com BE, LEGO.com BE, Amazon.nl (ships to BE), etc.
   - Insert NL retailers: bol.com NL, LEGO.com NL, Amazon.nl, etc.
   - Use placeholder data (real names, placeholder URLs)
-- [ ] Create `supabase/seed/seed_sets.sql` (optional):
+- [x] Create `supabase/seed/seed_sets.sql` (optional):
   - Insert 10 test sets (Star Wars, City, Technic mix)
   - Realistic set_num, name, theme, year, msrp_eur
 
 ## 7. Migration Documentation
 
-- [ ] Create `docs/migrations.md`:
+- [x] Create `docs/migrations.md`:
   - How to apply migrations locally (`supabase db reset`, `supabase migration up`)
   - How to apply to staging/prod
   - How to create new migrations
