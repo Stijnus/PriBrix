@@ -3,14 +3,18 @@ import { Pressable, Text, View, useWindowDimensions } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 
 import { Badge } from '@/src/components/ui/Badge';
+import { PremiumBadge } from '@/src/features/premium/components/PremiumBadge';
 import type { PriceHistoryPoint } from '@/src/lib/validation/prices';
 import { colors } from '@/src/theme/colors';
+import { classes } from '@/src/utils/classes';
 import { formatPrice } from '@/src/utils/formatPrice';
 
 type PriceHistoryChartProps = {
   data: PriceHistoryPoint[];
   selectedHistoryDays: 30 | 90 | 365;
   onSelectHistoryDays: (days: 30 | 90 | 365) => void;
+  maxHistoryDays: 30 | 365;
+  onSelectLockedHistoryDays?: (days: 90 | 365) => void;
   isLoading?: boolean;
 };
 
@@ -31,6 +35,8 @@ export function PriceHistoryChart({
   data,
   selectedHistoryDays,
   onSelectHistoryDays,
+  maxHistoryDays,
+  onSelectLockedHistoryDays,
   isLoading = false,
 }: PriceHistoryChartProps) {
   const { width } = useWindowDimensions();
@@ -67,27 +73,38 @@ export function PriceHistoryChart({
       </View>
 
       <View className="flex-row gap-2">
-        {periods.map((period) => (
-          <Pressable
-            key={period.value}
-            className={`rounded-full px-3 py-1.5 text-sm ${
-              period.value === selectedHistoryDays
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-300'
-            }`}
-            onPress={() => onSelectHistoryDays(period.value)}
-          >
-            <Text
-              className={
+        {periods.map((period) => {
+          const isLocked = maxHistoryDays === 30 && period.value !== 30;
+
+          return (
+            <Pressable
+              key={period.value}
+              className={classes(
+                'rounded-full px-3 py-1.5 text-sm',
                 period.value === selectedHistoryDays
-                  ? 'text-sm font-medium text-primary-700'
-                  : 'text-sm font-medium text-neutral-500 dark:text-neutral-300'
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-300',
+                isLocked && 'opacity-80',
+              )}
+              onPress={() =>
+                isLocked ? onSelectLockedHistoryDays?.(period.value) : onSelectHistoryDays(period.value)
               }
             >
-              {period.label}
-            </Text>
-          </Pressable>
-        ))}
+              <View className="flex-row items-center gap-1.5">
+                <Text
+                  className={
+                    period.value === selectedHistoryDays
+                      ? 'text-sm font-medium text-primary-700'
+                      : 'text-sm font-medium text-neutral-500 dark:text-neutral-300'
+                  }
+                >
+                  {period.label}
+                </Text>
+                {isLocked ? <PremiumBadge interactive={false} /> : null}
+              </View>
+            </Pressable>
+          );
+        })}
       </View>
 
       {isLoading && data.length === 0 ? (

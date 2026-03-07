@@ -5,6 +5,7 @@ const config: ExpoConfig = {
   slug: 'pribrix',
   scheme: 'pribrix',
   version: '1.0.0',
+  runtimeVersion: '1.0.0',
   orientation: 'portrait',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
@@ -13,10 +14,17 @@ const config: ExpoConfig = {
     image: './assets/images/splash-icon.png',
     resizeMode: 'contain',
     backgroundColor: '#FFF8F0',
+    dark: {
+      image: './assets/images/splash-icon.png',
+      backgroundColor: '#111827',
+    },
   },
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.pribrix.app',
+    infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
+    },
   },
   android: {
     package: 'com.pribrix.app',
@@ -32,7 +40,7 @@ const config: ExpoConfig = {
     output: 'static',
     favicon: './assets/images/favicon.png',
   },
-  plugins: ['expo-router', 'expo-notifications'],
+  plugins: ['expo-router', 'expo-notifications', '@sentry/react-native', 'sentry-expo'],
   experiments: {
     typedRoutes: true,
   },
@@ -42,6 +50,9 @@ const config: ExpoConfig = {
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
     apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL,
+    eas: {
+      projectId: 'a511e2fa-f536-4528-a5d3-86b09d6c4a47',
+    },
   },
 };
 

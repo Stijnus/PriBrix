@@ -4,7 +4,7 @@
 
 **Prerequisites:** Phase 5 (auth working), Phase 6 (ingestion running + best prices updated daily)
 
-**Status: IMPLEMENTED** ✓ Source verified 2026-03-07. All mobile and server-side code is in place. lint + typecheck + web export pass. Pending: deploy updated edge functions (401 in CLI session) + end-to-end live device verification.
+**Status: IMPLEMENTED + DEPLOYED** ✓ Verified 2026-03-07. `ingest_daily_prices` and `run_alerts_after_ingest` are live and return the Phase 8 response shape. Pending: signed-in physical-device verification for push registration, delivery, cooldown behavior, and alert history.
 
 ---
 
@@ -95,22 +95,10 @@
 - [ ] Push permission request appears on first login — **needs signed-in device build**
 - [ ] Push token is saved in `push_tokens` table — **needs signed-in device build**
 - [ ] Creating an alert from watchlist item saves to `alerts` table — **needs signed-in device build**
-- [ ] Running `run_alerts_after_ingest` evaluates alerts correctly — **needs deployment (401 in CLI session; deploy via Supabase Dashboard or MCP)**
-- [ ] Push notification is received when price drops below threshold — **needs deployment + live device**
-- [ ] Cooldown is respected (no duplicate notifications within cooldown period) — **needs deployment + live device**
-- [ ] Alert events appear in the Alerts history screen — **needs deployment + live device**
-- [ ] Tapping a notification opens the correct Set Detail screen — **needs deployment + live device**
-- [ ] Invalid/expired push tokens are cleaned up — **needs deployment + live device**
+- [ ] Running `run_alerts_after_ingest` evaluates alerts correctly — **needs live test data + signed-in device**
+- [ ] Push notification is received when price drops below threshold — **needs signed-in device**
+- [ ] Cooldown is respected (no duplicate notifications within cooldown period) — **needs signed-in device**
+- [ ] Alert events appear in the Alerts history screen — **needs signed-in device**
+- [ ] Tapping a notification opens the correct Set Detail screen — **needs signed-in device**
+- [ ] Invalid/expired push tokens are cleaned up — **needs signed-in device**
 - [ ] Alert toggle (enable/disable) works correctly — **needs signed-in device build**
-
-### Deployment Blockers
-
-Both edge function deploys returned **401 Unauthorized** from the CLI session. To unblock:
-
-```bash
-# Option 1: deploy via Supabase Dashboard → Edge Functions → Deploy
-# Option 2: re-authenticate CLI and redeploy
-supabase login
-supabase functions deploy ingest_daily_prices
-supabase functions deploy run_alerts_after_ingest
-```

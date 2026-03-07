@@ -100,7 +100,8 @@ export async function createAlert(input: UpsertAlertInput): Promise<Alert> {
       {
         watch_id: input.watchId,
         type: input.type,
-        threshold_price: input.thresholdPrice,
+        threshold_price: input.thresholdPrice ?? null,
+        threshold_percent: input.thresholdPercent ?? null,
         cooldown_hours: input.cooldownHours ?? 24,
         is_enabled: input.isEnabled ?? true,
       },
@@ -123,6 +124,18 @@ export async function updateAlert(input: UpdateAlertInput): Promise<Alert> {
 
   if (input.thresholdPrice != null) {
     payload.threshold_price = input.thresholdPrice;
+  }
+
+  if (input.thresholdPrice === null) {
+    payload.threshold_price = null;
+  }
+
+  if (input.thresholdPercent != null) {
+    payload.threshold_percent = input.thresholdPercent;
+  }
+
+  if (input.thresholdPercent === null) {
+    payload.threshold_percent = null;
   }
 
   if (input.isEnabled != null) {

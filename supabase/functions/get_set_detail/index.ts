@@ -3,6 +3,8 @@ import { createServiceRoleClient } from '../_shared/supabaseClient.ts';
 import { GetSetDetailInputSchema } from './types.ts';
 
 const ACTIVE_OFFER_WINDOW_DAYS = 7;
+const FREE_HISTORY_DAYS = 30;
+const PREMIUM_HISTORY_DAYS = 365;
 
 function getIsoDateDaysAgo(days: number) {
   const date = new Date();
@@ -19,6 +21,38 @@ function getIsoTimestampDaysAgo(days: number) {
 
 function coerceNumeric(value: unknown) {
   return value == null ? null : Number(value);
+}
+
+async function resolveAllowedHistoryDays(
+  supabase: ReturnType<typeof createServiceRoleClient>,
+  userId?: string,
+) {
+  if (!userId) {
+    return FREE_HISTORY_DAYS;
+  }
+
+  const { data, error } = await supabase
+    .from('user_plans')
+    .select('plan,status,current_period_end')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data || data.plan !== 'premium') {
+    return FREE_HISTORY_DAYS;
+  }
+
+  const status = String(data.status ?? 'active');
+  const periodEnd = data.current_period_end ? new Date(String(data.current_period_end)).getTime() : null;
+  const hasPremiumAccess =
+    status === 'active' ||
+    status === 'past_due' ||
+    (periodEnd != null && periodEnd > Date.now());
+
+  return hasPremiumAccess ? PREMIUM_HISTORY_DAYS : FREE_HISTORY_DAYS;
 }
 
 function isOfferActive(offer: { stock_status: string | null; last_seen_at: string | null }, cutoffIso: string) {
@@ -50,6 +84,8 @@ Deno.serve(async (request) => {
 
     const input = parsedInput.data;
     const supabase = createServiceRoleClient();
+    const allowedHistoryDays = await resolveAllowedHistoryDays(supabase, input.user_id);
+    const effectiveHistoryDays = Math.min(input.include_history_days, allowedHistoryDays);
 
     const { data: setRow, error: setError } = await supabase
       .from('sets')
@@ -66,7 +102,7 @@ Deno.serve(async (request) => {
     }
 
     const activeOfferCutoff = getIsoTimestampDaysAgo(ACTIVE_OFFER_WINDOW_DAYS);
-    const historyStartDate = getIsoDateDaysAgo(input.include_history_days);
+    const historyStartDate = getIsoDateDaysAgo(effectiveHistoryDays);
 
     const [offersResponse, bestPricesResponse, historyResponse] = await Promise.all([
       (input.country === '*'

@@ -11,8 +11,14 @@ import {
   useDeleteAlert,
   useUpdateAlert,
 } from '@/src/features/alerts/hooks';
+import type { AlertType } from '@/src/features/alerts/types';
+import { PremiumBadge } from '@/src/features/premium/components/PremiumBadge';
+import { UpgradePrompt } from '@/src/features/premium/components/UpgradePrompt';
+import { useEntitlements } from '@/src/features/premium/hooks';
+import { trackAlertCreated } from '@/src/lib/analytics/events';
 import type { Set } from '@/src/lib/validation/sets';
 import { colors } from '@/src/theme/colors';
+import { classes } from '@/src/utils/classes';
 import { formatPrice } from '@/src/utils/formatPrice';
 
 import type { WatchlistEntry } from '../hooks';
@@ -21,6 +27,42 @@ export type ResolvedWatchlistEntry = WatchlistEntry & {
   set: Set | null;
   currentPrice: number | null;
 };
+
+const alertTypeOptions = [
+  { type: 'below_base_price', label: 'Base target' },
+  { type: 'below_delivered_price', label: 'Delivered target' },
+  { type: 'percent_drop_30d', label: '30d drop %' },
+  { type: 'lowest_90d', label: '90d low' },
+] as const satisfies { type: AlertType; label: string }[];
+
+function getAlertSummary(
+  alert:
+    | {
+        type: AlertType;
+        threshold_price: number | null;
+        threshold_percent: number | null;
+        is_enabled: boolean;
+      }
+    | null,
+) {
+  if (!alert) {
+    return 'No alert configured yet';
+  }
+
+  if (alert.type === 'percent_drop_30d') {
+    return alert.is_enabled
+      ? `Alert set at ${alert.threshold_percent ?? 0}% drop`
+      : `Alert paused at ${alert.threshold_percent ?? 0}% drop`;
+  }
+
+  if (alert.type === 'lowest_90d') {
+    return alert.is_enabled ? 'Alert set for 90-day low' : 'Alert paused for 90-day low';
+  }
+
+  return alert.is_enabled
+    ? `Alert set at ${formatPrice(alert.threshold_price)}`
+    : `Alert paused at ${formatPrice(alert.threshold_price)}`;
+}
 
 function WatchlistRow({
   item,
@@ -32,28 +74,44 @@ function WatchlistRow({
   onRemove: (item: { setNum: string; country?: WatchlistEntry['country'] }) => void;
 }) {
   const [isEditingAlert, setIsEditingAlert] = useState(false);
+  const [selectedAlertType, setSelectedAlertType] = useState<AlertType>('below_base_price');
   const [thresholdInput, setThresholdInput] = useState('');
   const [isAlertEnabled, setIsAlertEnabled] = useState(true);
   const alerts = useAlerts(item.id, isSignedIn && Boolean(item.id));
+  const { entitlements } = useEntitlements();
   const createAlert = useCreateAlert();
   const updateAlert = useUpdateAlert();
   const deleteAlert = useDeleteAlert();
-  const baseAlert = useMemo(
-    () => alerts.items.find((alert) => alert.type === 'below_base_price') ?? null,
-    [alerts.items],
+  const selectedAlert = useMemo(
+    () => alerts.items.find((alert) => alert.type === selectedAlertType) ?? null,
+    [alerts.items, selectedAlertType],
   );
+  const primaryAlert = alerts.items[0] ?? null;
 
   useEffect(() => {
-    if (baseAlert?.threshold_price != null) {
-      setThresholdInput(String(baseAlert.threshold_price));
-    } else if (item.target_base_price != null) {
+    if (selectedAlert?.threshold_price != null) {
+      setThresholdInput(String(selectedAlert.threshold_price));
+    } else if (selectedAlert?.threshold_percent != null) {
+      setThresholdInput(String(selectedAlert.threshold_percent));
+    } else if (item.target_base_price != null && selectedAlertType === 'below_base_price') {
       setThresholdInput(String(item.target_base_price));
     } else {
       setThresholdInput('');
     }
 
-    setIsAlertEnabled(baseAlert?.is_enabled ?? true);
-  }, [baseAlert?.id, baseAlert?.is_enabled, baseAlert?.threshold_price, item.target_base_price]);
+    setIsAlertEnabled(selectedAlert?.is_enabled ?? true);
+  }, [
+    item.target_base_price,
+    selectedAlert?.id,
+    selectedAlert?.is_enabled,
+    selectedAlert?.threshold_percent,
+    selectedAlert?.threshold_price,
+    selectedAlertType,
+  ]);
+
+  function openPaywall() {
+    router.push({ pathname: '/modal/paywall', params: { reason: 'alerts_upgrade' } });
+  }
 
   async function handleSaveAlert() {
     if (!isSignedIn) {
@@ -66,47 +124,80 @@ function WatchlistRow({
       return;
     }
 
-    const normalizedInput = thresholdInput.replace(',', '.').trim();
-    const thresholdPrice = Number.parseFloat(normalizedInput);
+    if (!entitlements.alertTypes.includes(selectedAlertType)) {
+      openPaywall();
+      return;
+    }
 
-    if (!Number.isFinite(thresholdPrice) || thresholdPrice <= 0) {
+    if (
+      entitlements.alertsPerSet != null &&
+      alerts.items.length >= entitlements.alertsPerSet &&
+      !selectedAlert
+    ) {
+      openPaywall();
+      return;
+    }
+
+    const normalizedInput = thresholdInput.replace(',', '.').trim();
+    const numericValue = normalizedInput ? Number.parseFloat(normalizedInput) : undefined;
+    const requiresPrice =
+      selectedAlertType === 'below_base_price' || selectedAlertType === 'below_delivered_price';
+    const requiresPercent = selectedAlertType === 'percent_drop_30d';
+
+    if (requiresPrice && (!Number.isFinite(numericValue) || (numericValue ?? 0) <= 0)) {
       Alert.alert('Enter a valid price', 'Use a target price above zero in EUR.');
       return;
     }
 
+    if (requiresPercent && (!Number.isFinite(numericValue) || (numericValue ?? 0) <= 0)) {
+      Alert.alert('Enter a valid drop', 'Use a percentage drop above zero.');
+      return;
+    }
+
     try {
-      if (baseAlert) {
+      if (selectedAlert) {
         await updateAlert.mutateAsync({
-          alertId: baseAlert.id,
-          thresholdPrice,
+          alertId: selectedAlert.id,
+          thresholdPrice: requiresPrice ? numericValue : null,
+          thresholdPercent: requiresPercent ? numericValue : null,
           isEnabled: isAlertEnabled,
         });
       } else {
         await createAlert.mutateAsync({
           watchId: item.id,
-          type: 'below_base_price',
-          thresholdPrice,
+          type: selectedAlertType,
+          thresholdPrice: requiresPrice ? numericValue : undefined,
+          thresholdPercent: requiresPercent ? numericValue : undefined,
           isEnabled: isAlertEnabled,
         });
+        trackAlertCreated(
+          item.set_num,
+          selectedAlertType,
+          typeof numericValue === 'number' && Number.isFinite(numericValue) ? numericValue : null,
+        );
       }
 
       setIsEditingAlert(false);
     } catch (error) {
-      Alert.alert(
-        'Could not save alert',
-        error instanceof Error ? error.message : 'Try again in a moment.',
-      );
+      const message = error instanceof Error ? error.message : 'Try again in a moment.';
+
+      if (message.toLowerCase().includes('free plan')) {
+        openPaywall();
+        return;
+      }
+
+      Alert.alert('Could not save alert', message);
     }
   }
 
   async function handleRemoveAlert() {
-    if (!baseAlert || !item.id) {
+    if (!selectedAlert || !item.id) {
       return;
     }
 
     try {
       await deleteAlert.mutateAsync({
-        alertId: baseAlert.id,
+        alertId: selectedAlert.id,
         watchId: item.id,
       });
       setIsEditingAlert(false);
@@ -136,13 +227,7 @@ function WatchlistRow({
           <PriceDisplay price={item.currentPrice} compact />
           {isSignedIn ? (
             <Text className="text-sm text-neutral-500 dark:text-neutral-400">
-              {alerts.isLoading
-                ? 'Loading alert status…'
-                : baseAlert?.threshold_price != null
-                  ? baseAlert.is_enabled
-                    ? `Alert set at ${formatPrice(baseAlert.threshold_price)}`
-                    : `Alert paused at ${formatPrice(baseAlert.threshold_price)}`
-                  : 'No alert configured yet'}
+              {alerts.isLoading ? 'Loading alert status…' : getAlertSummary(primaryAlert)}
             </Text>
           ) : (
             <Text className="text-sm text-neutral-500 dark:text-neutral-400">
@@ -162,11 +247,11 @@ function WatchlistRow({
         <View className="flex-row items-center justify-between gap-3">
           <View className="flex-1 gap-1">
             <Text className="text-sm font-semibold text-neutral-700 dark:text-neutral-100">
-              {isSignedIn ? 'Price alert' : 'Push alerts'}
+              {isSignedIn ? 'Price alerts' : 'Push alerts'}
             </Text>
             <Text className="text-sm text-neutral-500 dark:text-neutral-400">
               {isSignedIn
-                ? 'Notify me when the best base price drops below this target.'
+                ? 'Configure alerts for this watched set.'
                 : 'Sign in to save and sync alerts across devices.'}
             </Text>
           </View>
@@ -182,21 +267,83 @@ function WatchlistRow({
             }}
           >
             <Text className="text-sm font-semibold text-white">
-              {isSignedIn ? (isEditingAlert ? 'Close' : baseAlert ? 'Edit alert' : 'Set alert') : 'Sign in'}
+              {isSignedIn ? (isEditingAlert ? 'Close' : alerts.items.length > 0 ? 'Manage alerts' : 'Set alert') : 'Sign in'}
             </Text>
           </Pressable>
         </View>
 
+        {alerts.items.length > 0 ? (
+          <View className="flex-row flex-wrap gap-2">
+            {alerts.items.map((alert) => (
+              <View key={alert.id} className="rounded-full bg-white px-3 py-1.5 dark:bg-neutral-800">
+                <Text className="text-xs font-medium text-neutral-600 dark:text-neutral-300">
+                  {getAlertSummary(alert)}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+
         {isEditingAlert && isSignedIn ? (
           <View className="gap-3">
-            <TextInput
-              value={thresholdInput}
-              onChangeText={setThresholdInput}
-              keyboardType="decimal-pad"
-              placeholder="EUR 99.99"
-              placeholderTextColor={colors.neutral[400]}
-              className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
-            />
+            <View className="flex-row flex-wrap gap-2">
+              {alertTypeOptions.map((option) => {
+                const isAllowed = entitlements.alertTypes.includes(option.type);
+
+                return (
+                  <Pressable
+                    key={option.type}
+                    className={classes(
+                      'rounded-full px-3 py-1.5',
+                      selectedAlertType === option.type
+                        ? 'bg-primary-100'
+                        : 'bg-neutral-100 dark:bg-neutral-800',
+                    )}
+                    onPress={() => {
+                      if (!isAllowed) {
+                        openPaywall();
+                        return;
+                      }
+
+                      setSelectedAlertType(option.type);
+                    }}
+                  >
+                    <View className="flex-row items-center gap-1.5">
+                      <Text
+                        className={
+                          selectedAlertType === option.type
+                            ? 'text-sm font-medium text-primary-700'
+                            : 'text-sm font-medium text-neutral-500 dark:text-neutral-300'
+                        }
+                      >
+                        {option.label}
+                      </Text>
+                      {!isAllowed ? <PremiumBadge interactive={false} /> : null}
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {selectedAlertType !== 'lowest_90d' ? (
+              <TextInput
+                value={thresholdInput}
+                onChangeText={setThresholdInput}
+                keyboardType="decimal-pad"
+                placeholder={
+                  selectedAlertType === 'percent_drop_30d' ? 'Drop percentage, e.g. 10' : 'EUR 99.99'
+                }
+                placeholderTextColor={colors.neutral[400]}
+                className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+              />
+            ) : (
+              <View className="rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
+                <Text className="text-sm text-neutral-600 dark:text-neutral-300">
+                  Trigger when this set hits a new 90-day low in your selected country.
+                </Text>
+              </View>
+            )}
+
             <View className="flex-row items-center justify-between">
               <View className="flex-1 pr-4">
                 <Text className="text-sm font-semibold text-neutral-700 dark:text-neutral-100">
@@ -212,13 +359,17 @@ function WatchlistRow({
                 trackColor={{ false: colors.neutral[300], true: colors.primary[600] }}
               />
             </View>
+
             <View className="flex-row gap-2">
-              <Pressable className="flex-1 items-center rounded-lg bg-primary-600 px-4 py-3" onPress={() => void handleSaveAlert()}>
+              <Pressable
+                className="flex-1 items-center rounded-lg bg-primary-600 px-4 py-3"
+                onPress={() => void handleSaveAlert()}
+              >
                 <Text className="text-sm font-semibold text-white">
-                  {baseAlert ? 'Save alert' : 'Create alert'}
+                  {selectedAlert ? 'Save alert' : 'Create alert'}
                 </Text>
               </Pressable>
-              {baseAlert ? (
+              {selectedAlert ? (
                 <Pressable
                   className="items-center rounded-lg bg-neutral-200 px-4 py-3 dark:bg-neutral-700"
                   onPress={() => void handleRemoveAlert()}
@@ -229,6 +380,15 @@ function WatchlistRow({
                 </Pressable>
               ) : null}
             </View>
+
+            {entitlements.alertTypes.length === 1 ? (
+              <UpgradePrompt
+                title="Advanced alerts"
+                description="Premium unlocks delivered-price alerts, 30-day drop alerts, and 90-day low alerts."
+                ctaLabel="See Premium"
+                reason="alerts_upgrade"
+              />
+            ) : null}
           </View>
         ) : null}
       </View>

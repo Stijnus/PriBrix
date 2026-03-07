@@ -1,6 +1,7 @@
 import '../global.css';
 
 import { QueryClientProvider } from '@tanstack/react-query';
+import * as Sentry from '@sentry/react-native';
 import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
 import { Stack, useRouter } from 'expo-router';
@@ -11,8 +12,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { getMagicLinkCallbackRoute } from '@/src/features/auth/linking';
 import { SessionProvider } from '@/src/lib/auth/session';
+import { initSentry } from '@/src/lib/monitoring/sentry';
 import { queryClient } from '@/src/lib/queryClient';
 import { colors } from '@/src/theme/colors';
+
+initSentry();
 
 if (Platform.OS !== 'web') {
   Notifications.setNotificationHandler({
@@ -114,28 +118,35 @@ function AuthCallbackNavigation() {
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <SessionProvider>
-          <AuthCallbackNavigation />
-          <NotificationNavigation />
-          <StatusBar style="auto" />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: {
-                backgroundColor: colors.neutral[50],
-              },
-            }}
-          >
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="auth/sign-in" />
-            <Stack.Screen name="auth/verify" />
-            <Stack.Screen name="set/[setNum]" />
-            <Stack.Screen name="modal/add-to-list" options={{ presentation: 'modal' }} />
-          </Stack>
-        </SessionProvider>
-      </QueryClientProvider>
-    </SafeAreaProvider>
+    <Sentry.ErrorBoundary fallback={<StatusBar style="auto" />}>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <SessionProvider>
+            <AuthCallbackNavigation />
+            <NotificationNavigation />
+            <StatusBar style="auto" />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: {
+                  backgroundColor: colors.neutral[50],
+                },
+              }}
+            >
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="auth/sign-in" />
+              <Stack.Screen name="auth/verify" />
+              <Stack.Screen name="set/[setNum]" />
+              <Stack.Screen name="settings/privacy-policy" />
+              <Stack.Screen name="settings/terms" />
+              <Stack.Screen name="settings/affiliate-disclosure" />
+              <Stack.Screen name="settings/delete-account" />
+              <Stack.Screen name="modal/add-to-list" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="modal/paywall" options={{ presentation: 'modal' }} />
+            </Stack>
+          </SessionProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </Sentry.ErrorBoundary>
   );
 }

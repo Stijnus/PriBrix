@@ -1,6 +1,6 @@
 # PriBrix — Pending TODOs
 
-Items that are deferred but need to be tackled before production launch.
+Items that remain after the internal-beta feature build. This file now tracks beta blockers and production-launch work, not old phase placeholders.
 
 ---
 
@@ -60,12 +60,49 @@ See **Affiliate Feed Credentials** section below for the full flow.
 
 ---
 
-## Push Notifications (Phase 8)
+## Internal Beta Operations
 
-Price alert push notifications require an Expo push token. Deferred until Phase 8.
+### Live function parity
+
+- `get_set_detail` — live
+- `ingest_daily_prices` — live
+- `run_alerts_after_ingest` — live
+- `delete_user_data` — **not deployed yet** (endpoint returns 404 as of 2026-03-07)
+
+### Monitoring / build setup
+
+- Configure Sentry env vars:
+  - `EXPO_PUBLIC_SENTRY_DSN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
+  - `SENTRY_AUTH_TOKEN`
+- Confirm the new EAS project link is working and run preview builds for iOS + Android
+- Android preview build has been queued once successfully; keep tracking its result in EAS
+- iOS preview build still needs Apple Developer credentials or a `credentials.json` flow
+- Send a real Sentry test event from a preview build and confirm ingestion in Sentry
+
+### Device QA
+
+- Run the signed-in physical-device checklist from `docs/internal-beta-qa.md`
+- Verify push permission prompt, token registration, alert delivery, cooldown, and notification deep link handling
+- Verify delete-account flow end-to-end after `delete_user_data` is deployed
 
 ---
 
-## Premium Tier (Phase 9)
+## Premium Billing (deferred until soft/public launch)
 
-RevenueCat integration for subscription management. Deferred until Phase 9.
+- Keep Premium in manual-entitlement mode for internal beta
+- Decide on billing provider later:
+  - app-store billing only
+  - Stripe web checkout for early web-based billing
+  - RevenueCat if subscription management complexity increases
+
+---
+
+## Public Launch Backlog
+
+- Finalize live retailer feeds and match-queue cleanup
+- Produce store screenshots and feature graphic
+- Complete App Store / Google Play metadata and compliance forms
+- Decide whether hosted legal URLs are needed beyond the in-app screens
+- Revisit tablet support only after phone-only beta is stable

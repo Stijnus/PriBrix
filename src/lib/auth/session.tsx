@@ -5,6 +5,8 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 
 import { registerPushToken } from '@/src/features/alerts/api';
 import { listenForPushTokenChanges, requestPushToken } from '@/src/features/alerts/utils/pushToken';
+import { identify, reset } from '@/src/lib/analytics/tracker';
+import { trackListMigrationCompleted } from '@/src/lib/analytics/events';
 import {
   hasCompletedMigration,
 } from '@/src/lib/storage/authState';
@@ -36,6 +38,15 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [isMigrating, setIsMigrating] = useState(false);
   const migratingUserRef = useRef<string | null>(null);
   const userId = session?.user?.id ?? null;
+
+  useEffect(() => {
+    if (userId) {
+      identify(userId);
+      return;
+    }
+
+    reset();
+  }, [userId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -112,6 +123,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         const result = await migrateLocalLists(activeUserId);
 
         if (!isCancelled) {
+          trackListMigrationCompleted({
+            watchlist: result.migratedWatchlistCount,
+            wishlist: result.migratedWishlistCount,
+            owned: result.migratedOwnedCount,
+          });
           Alert.alert(
             'Lists synced',
             `Watchlist ${result.migratedWatchlistCount}, wishlist ${result.migratedWishlistCount}, collection ${result.migratedOwnedCount}.`,

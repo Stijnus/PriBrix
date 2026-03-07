@@ -5,6 +5,19 @@ import { PriceDisplay } from '@/src/components/ui/PriceDisplay';
 import type { AlertEventHistoryItem } from '@/src/lib/validation/alerts';
 import { formatRelativeTime } from '@/src/utils/formatRelativeTime';
 
+function getAlertTypeLabel(type: AlertEventHistoryItem['alert_type']) {
+  switch (type) {
+    case 'below_delivered_price':
+      return 'Delivered';
+    case 'percent_drop_30d':
+      return '30d drop';
+    case 'lowest_90d':
+      return '90d low';
+    default:
+      return 'Base';
+  }
+}
+
 export function AlertEventRow({
   item,
   onPress,
@@ -28,6 +41,7 @@ export function AlertEventRow({
         </Text>
         <View className="flex-row flex-wrap gap-2">
           <Badge label={item.watch_country} variant="country" />
+          <Badge label={getAlertTypeLabel(item.alert_type)} variant="unknown" />
           {item.sent_push ? (
             <Badge label="Push sent" variant="premium" />
           ) : null}

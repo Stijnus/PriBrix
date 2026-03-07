@@ -6,10 +6,12 @@ import { ErrorState } from '@/src/components/ui/ErrorState';
 import { LoadingSkeleton } from '@/src/components/ui/LoadingSkeleton';
 import { useAuth } from '@/src/features/auth/hooks';
 import { useOwned } from '@/src/features/owned/hooks';
+import { useEntitlements } from '@/src/features/premium/hooks';
 import { useSetSummary } from '@/src/features/sets/hooks';
 import { useWatchlist } from '@/src/features/watchlist/hooks';
 import { useWishlist } from '@/src/features/wishlist/hooks';
 import { usePreferences } from '@/src/hooks/usePreferences';
+import { trackWatchAdded } from '@/src/lib/analytics/events';
 import { colors } from '@/src/theme/colors';
 
 const modes = ['watchlist', 'wishlist', 'owned'] as const;
@@ -33,6 +35,7 @@ export default function AddToListModal() {
   const [country, setCountry] = useState<'BE' | 'NL' | '*'>('*');
   const [targetPrice, setTargetPrice] = useState('');
   const { preferences } = usePreferences();
+  const { entitlements } = useEntitlements();
   const { user } = useAuth();
   const summary = useSetSummary(setNum);
   const owned = useOwned();
@@ -62,24 +65,53 @@ export default function AddToListModal() {
   const setSummary = summary.data;
 
   async function handleSave() {
-    if (mode === 'watchlist') {
-      await watchlist.addItem({
-        set_num: setNum,
-        country,
-        target_base_price: targetPrice ? Number(targetPrice.replace(',', '.')) : undefined,
-      });
-    } else if (mode === 'wishlist') {
-      await wishlist.addItem({
-        set_num: setNum,
-        priority,
-        target_base_price: targetPrice ? Number(targetPrice.replace(',', '.')) : undefined,
-      });
-    } else {
-      await owned.addItem({
-        set_num: setNum,
-        quantity: Math.max(1, Number(quantity) || 1),
-        condition,
-      });
+    try {
+      if (mode === 'watchlist') {
+        const alreadyWatching = watchlist.items.some(
+          (item) => item.set_num === setNum && (item.country ?? '*') === (country ?? '*'),
+        );
+
+        if (
+          entitlements.watchlistLimit != null &&
+          !alreadyWatching &&
+          watchlist.items.length >= entitlements.watchlistLimit
+        ) {
+          router.push({ pathname: '/modal/paywall', params: { reason: 'watchlist_limit' } });
+          return;
+        }
+
+        await watchlist.addItem({
+          set_num: setNum,
+          country,
+          target_base_price: targetPrice ? Number(targetPrice.replace(',', '.')) : undefined,
+        });
+        trackWatchAdded(setNum, country);
+      } else if (mode === 'wishlist') {
+        await wishlist.addItem({
+          set_num: setNum,
+          priority,
+          target_base_price: targetPrice ? Number(targetPrice.replace(',', '.')) : undefined,
+        });
+      } else {
+        await owned.addItem({
+          set_num: setNum,
+          quantity: Math.max(1, Number(quantity) || 1),
+          condition,
+        });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not save this list item.';
+
+      if (
+        message.toLowerCase().includes('watchlist limit') ||
+        message.toLowerCase().includes('upgrade to premium')
+      ) {
+        router.push({ pathname: '/modal/paywall', params: { reason: 'watchlist_limit' } });
+        return;
+      }
+
+      Alert.alert('Could not save', message);
+      return;
     }
 
     Alert.alert(
@@ -132,6 +164,11 @@ export default function AddToListModal() {
               </Text>
             </Pressable>
           ) : null}
+          <Text className="text-sm text-neutral-500 dark:text-neutral-400">
+            {entitlements.watchlistLimit == null
+              ? `${watchlist.items.length} watch slots used · Unlimited on Premium`
+              : `${watchlist.items.length} / ${entitlements.watchlistLimit} watch slots used`}
+          </Text>
           <View className="flex-row gap-2">
             {(['BE', 'NL', '*'] as const).map((value) => (
               <Text

@@ -4,6 +4,8 @@
 
 **Prerequisites:** All previous phases (core features complete)
 
+**Status: INTERNAL BETA IN REPO** ✓ Verified 2026-03-07. Legal screens, analytics hooks, Sentry wiring, release docs, and the account deletion function are implemented in the repo. Remaining blockers are operational: deploy `delete_user_data`, configure Sentry env, link EAS builds to devices, and complete physical-device QA.
+
 ---
 
 ## 1. Legal Screens

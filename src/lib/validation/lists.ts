@@ -8,8 +8,8 @@ export const WatchlistItemSchema = z.object({
   id: z.string().uuid(),
   set_id: z.string().uuid(),
   country: CountryScopeSchema.default('*'),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional(),
+  created_at: z.string().datetime({ offset: true }).optional(),
+  updated_at: z.string().datetime({ offset: true }).optional(),
 });
 
 export const WishlistItemSchema = z.object({
@@ -19,8 +19,8 @@ export const WishlistItemSchema = z.object({
   target_base_price: z.number().nonnegative().nullable().optional(),
   target_delivered_price: z.number().nonnegative().nullable().optional(),
   notes: z.string().trim().max(500).nullable().optional(),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional(),
+  created_at: z.string().datetime({ offset: true }).optional(),
+  updated_at: z.string().datetime({ offset: true }).optional(),
 });
 
 export const OwnedSetSchema = z.object({
@@ -32,8 +32,8 @@ export const OwnedSetSchema = z.object({
   purchase_price: z.number().nonnegative().nullable().optional(),
   purchase_date: z.string().date().nullable().optional(),
   notes: z.string().trim().max(500).nullable().optional(),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional(),
+  created_at: z.string().datetime({ offset: true }).optional(),
+  updated_at: z.string().datetime({ offset: true }).optional(),
 });
 
 export const LocalWatchItemSchema = z.object({

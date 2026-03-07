@@ -28,13 +28,14 @@ export function useSetDetail(
   options: {
     country: CountryScope;
     historyDays: number;
+    userId?: string;
   },
 ) {
   const { isMockMode } = useMockMode();
   const clientRuntime = isClientRuntime();
 
   return useQuery({
-    queryKey: ['set-detail', setNum, options.country, options.historyDays, isMockMode],
+    queryKey: ['set-detail', setNum, options.country, options.historyDays, options.userId, isMockMode],
     queryFn: () => fetchSetDetail(setNum, options, isMockMode),
     enabled: clientRuntime && setNum.length > 0,
     placeholderData: (previousData) => previousData,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
@@ -10,7 +10,11 @@ import { PriceDisplay } from '@/src/components/ui/PriceDisplay';
 import { OfferRow } from '@/src/features/sets/components/OfferRow';
 import { PriceHistoryChart } from '@/src/features/sets/components/PriceHistoryChart';
 import { useSetDetail } from '@/src/features/sets/hooks';
+import { useAuth } from '@/src/features/auth/hooks';
+import { UpgradePrompt } from '@/src/features/premium/components/UpgradePrompt';
+import { useEntitlements } from '@/src/features/premium/hooks';
 import { usePreferences } from '@/src/hooks/usePreferences';
+import { trackSetViewed } from '@/src/lib/analytics/events';
 
 function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
@@ -20,11 +24,33 @@ export default function SetDetailScreen() {
   const { setNum: rawSetNum } = useLocalSearchParams<{ setNum: string }>();
   const setNum = getParam(rawSetNum);
   const { preferences } = usePreferences();
-  const [historyDays, setHistoryDays] = useState<30 | 90 | 365>(90);
+  const { user } = useAuth();
+  const { entitlements } = useEntitlements();
+  const [historyDays, setHistoryDays] = useState<30 | 90 | 365>(entitlements.historyDays);
+  const trackedSetRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (historyDays > entitlements.historyDays) {
+      setHistoryDays(entitlements.historyDays);
+    }
+  }, [entitlements.historyDays, historyDays]);
+
   const query = useSetDetail(setNum, {
     country: preferences.country,
     historyDays,
+    userId: user?.id,
   });
+
+  useEffect(() => {
+    const trackedSetNum = query.data?.set.set_num;
+
+    if (!trackedSetNum || trackedSetRef.current === trackedSetNum) {
+      return;
+    }
+
+    trackedSetRef.current = trackedSetNum;
+    trackSetViewed(trackedSetNum);
+  }, [query.data?.set.set_num]);
 
   if (query.isLoading) {
     return (
@@ -137,8 +163,20 @@ export default function SetDetailScreen() {
         data={priceHistory}
         selectedHistoryDays={historyDays}
         onSelectHistoryDays={setHistoryDays}
+        maxHistoryDays={entitlements.historyDays}
+        onSelectLockedHistoryDays={() =>
+          router.push({ pathname: '/modal/paywall', params: { reason: 'history_locked' } })
+        }
         isLoading={query.isFetching}
       />
+
+      {entitlements.historyDays === 30 ? (
+        <UpgradePrompt
+          title="Premium history"
+          description="Upgrade to unlock 90-day and 365-day price history on every set."
+          reason="history_upgrade"
+        />
+      ) : null}
 
       <View className="gap-3">
         <Text className="text-xl font-semibold text-neutral-700 dark:text-neutral-100">Offers</Text>

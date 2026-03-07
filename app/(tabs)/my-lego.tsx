@@ -7,6 +7,8 @@ import { LoadingSkeleton } from '@/src/components/ui/LoadingSkeleton';
 import { OwnedList } from '@/src/features/owned/components/OwnedList';
 import { useOwned } from '@/src/features/owned/hooks';
 import { useAuth } from '@/src/features/auth/hooks';
+import { UpgradePrompt } from '@/src/features/premium/components/UpgradePrompt';
+import { useEntitlements } from '@/src/features/premium/hooks';
 import { fetchSetDetail, fetchSetsBySetNums } from '@/src/features/sets/api';
 import { WatchlistList } from '@/src/features/watchlist/components/WatchlistList';
 import { useWatchlist } from '@/src/features/watchlist/hooks';
@@ -26,6 +28,7 @@ export default function MyLegoScreen() {
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]['value']>('owned');
   const { preferences } = usePreferences();
   const { isMockMode } = useMockMode();
+  const { entitlements, data: plan } = useEntitlements();
   const { user, isMigrating } = useAuth();
   const owned = useOwned();
   const wishlist = useWishlist();
@@ -166,6 +169,26 @@ export default function MyLegoScreen() {
       </View>
 
       {selectedContent}
+
+      {activeTab === 'watching' ? (
+        <View className="gap-3">
+          <View className="rounded-xl bg-white p-4 shadow-sm dark:bg-neutral-800">
+            <Text className="text-sm font-semibold uppercase tracking-wide text-primary-600">Watchlist usage</Text>
+            <Text className="mt-1 text-base text-neutral-600 dark:text-neutral-300">
+              {entitlements.watchlistLimit == null
+                ? `${watchlist.items.length} watch slots used · Unlimited on Premium`
+                : `${watchlist.items.length} / ${entitlements.watchlistLimit} watch slots used`}
+            </Text>
+          </View>
+          {entitlements.watchlistLimit != null ? (
+            <UpgradePrompt
+              title={plan?.isExpired ? 'Premium expired' : 'Need more watch slots?'}
+              description="Premium removes the 20-item watchlist cap and unlocks advanced alerts."
+              reason="watchlist_usage"
+            />
+          ) : null}
+        </View>
+      ) : null}
     </ScrollView>
   );
 }

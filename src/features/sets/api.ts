@@ -36,6 +36,7 @@ type ParsedBestPriceRow = {
 type SetDetailOptions = {
   country?: CountryScope;
   historyDays?: number;
+  userId?: string;
 };
 
 const DEFAULT_HISTORY_DAYS = 90;
@@ -281,12 +282,14 @@ export async function fetchSetDetailFromFunction(
   setNum: string,
   country: CountryScope,
   historyDays: number,
+  userId?: string,
 ): Promise<SetDetail | null> {
   const { data, error } = await supabase.functions.invoke('get_set_detail', {
     body: {
       set_num: setNum,
       country,
       include_history_days: historyDays,
+      user_id: userId,
     },
   });
 
@@ -541,7 +544,7 @@ export async function fetchSetDetail(
   }
 
   try {
-    return await fetchSetDetailFromFunction(setNum, country, historyDays);
+    return await fetchSetDetailFromFunction(setNum, country, historyDays, options.userId);
   } catch (error) {
     if (!isFunctionUnavailable(error) && __DEV__) {
       console.warn('get_set_detail function failed, falling back to direct queries.', error);

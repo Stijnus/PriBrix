@@ -1,18 +1,21 @@
 import type { Alert, AlertEventHistoryItem } from '@/src/lib/validation/alerts';
 
-export type AlertConfigType = Extract<Alert['type'], 'below_base_price'>;
+export type AlertType = Alert['type'];
+export type AlertConfigType = AlertType;
 
 export type UpsertAlertInput = {
   watchId: string;
   type: AlertConfigType;
-  thresholdPrice: number;
+  thresholdPrice?: number;
+  thresholdPercent?: number;
   isEnabled?: boolean;
   cooldownHours?: number;
 };
 
 export type UpdateAlertInput = {
   alertId: string;
-  thresholdPrice?: number;
+  thresholdPrice?: number | null;
+  thresholdPercent?: number | null;
   isEnabled?: boolean;
   cooldownHours?: number;
 };

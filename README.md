@@ -9,6 +9,8 @@
 
 Browse the best prices per LEGO set, compare across retailers, track price history, build your collection, and get alerts when prices drop.
 
+Current repo milestone: **internal beta**. The mobile app is feature-complete for beta flows, but production rollout still depends on live affiliate feed onboarding, physical-device QA, and final release operations.
+
 ---
 
 ## Features
@@ -160,19 +162,26 @@ For detailed architecture, see [project/architecture.md](project/architecture.md
 
 | Phase | Title | Status | Notes |
 |-------|-------|--------|-------|
-| 0 | Repo Bootstrap & Tooling | ✅ Done | Expo 54, TypeScript, NativeWind, Supabase client, CI |
-| 1 | Supabase Schema & RLS | ⏳ Next | Tables, indexes, Row Level Security policies |
-| 2 | Catalog Import | ⏳ Planned | Rebrickable dataset into `sets`, `offers` tables |
-| 3 | Mobile Anonymous MVP | ⏳ Planned | Browse, search, set detail, local watchlist |
-| 4 | Set Detail API | ⏳ Planned | `get_set_detail` edge function + offers + price history |
-| 5 | Auth & List Sync | ⏳ Planned | Supabase Auth, migrate local→server lists |
-| 6 | Daily Price Ingestion | ⏳ Planned | Scheduled edge function, retailer feeds, cache updates |
-| 7 | Admin Tooling | ⏳ Planned | Admin UI for monitoring, manual overrides |
-| 8 | Alerts & Push | ⏳ Planned | Alert evaluation, Expo Push notifications |
-| 9 | Premium Tier | ⏳ Planned | Paywall, extended history, extra alerts |
-| 10 | Release Readiness | ⏳ Planned | Store listing, legal pages, final QA |
+| 0 | Repo Bootstrap & Tooling | ✅ Done | Tooling, Expo Router, NativeWind, CI |
+| 1 | Supabase Schema & RLS | ✅ Done | Schema, RLS, seeds, migration docs |
+| 2 | Catalog Import | ✅ Done | Rebrickable import, retail filtering, catalog loaded |
+| 3 | Mobile Anonymous MVP | ✅ Done | Browse, search, set detail, local lists |
+| 4 | Set Detail API | ✅ Done | `get_set_detail` live and wired in mobile |
+| 5 | Auth & List Sync | ✅ Done | Magic-link auth, migration, synced lists |
+| 6 | Daily Price Ingestion | ✅ Done | Ingestion + cache refresh live; mock feed supported |
+| 7 | Admin Tooling | ✅ Done | Studio/SQL admin workflow for match queue and overrides |
+| 8 | Alerts & Push | 🟡 Beta verification | Functions live; physical-device push QA still pending |
+| 9 | Premium Tier | 🟡 Manual beta | Entitlements and paywall shipped; billing remains stubbed |
+| 10 | Release Readiness | 🟡 Internal beta | Legal, analytics, Sentry, and beta docs in repo; device QA remains |
 
 See [project/phases/](project/phases/) for detailed per-phase checklists.
+
+## Internal Beta Blockers
+
+- Real retailer data still depends on affiliate approvals and Edge Function feed secrets.
+- `delete_user_data` still needs to be deployed live to match the repo.
+- Sentry environment variables are not configured yet.
+- Physical-device QA and preview EAS builds are still required before tester rollout.
 
 ---
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FlatList, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 
@@ -7,6 +7,7 @@ import { ErrorState } from '@/src/components/ui/ErrorState';
 import { LoadingSkeleton } from '@/src/components/ui/LoadingSkeleton';
 import { SetCard } from '@/src/features/sets/components/SetCard';
 import { useSearchSets } from '@/src/features/search/hooks';
+import { trackSearchPerformed } from '@/src/lib/analytics/events';
 import { colors } from '@/src/theme/colors';
 
 export default function SearchScreen() {
@@ -16,6 +17,22 @@ export default function SearchScreen() {
     ...set,
     bestPriceByCountry: {},
   }));
+  const lastTrackedKey = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (search.debouncedQuery.length === 0 || search.isLoading || search.isError) {
+      return;
+    }
+
+    const trackingKey = `${search.debouncedQuery}:${items.length}`;
+
+    if (lastTrackedKey.current === trackingKey) {
+      return;
+    }
+
+    lastTrackedKey.current = trackingKey;
+    trackSearchPerformed(search.debouncedQuery, items.length);
+  }, [items.length, search.debouncedQuery, search.isError, search.isLoading]);
 
   return (
     <FlatList
