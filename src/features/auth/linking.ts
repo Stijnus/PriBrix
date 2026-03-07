@@ -1,4 +1,5 @@
 import * as Linking from 'expo-linking';
+import { Platform } from 'react-native';
 
 const APP_SCHEME = 'pribrix://';
 const AUTH_CALLBACK_PATH = '/auth/verify' as const;
@@ -62,13 +63,12 @@ function getRouteFromUrl(url: string) {
 }
 
 export function getMagicLinkRedirectUrl() {
-  const redirectUrl = Linking.createURL(AUTH_CALLBACK_PATH);
-
-  if (redirectUrl.startsWith(APP_SCHEME) && getRouteFromUrl(redirectUrl) !== AUTH_CALLBACK_ROUTE) {
-    return `${APP_SCHEME}${AUTH_CALLBACK_ROUTE}`;
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    return `${window.location.origin}/auth/verify`;
   }
-
-  return redirectUrl;
+  // Native: always use the canonical scheme (double slash, no leading slash in path)
+  // Expo Go does NOT support custom schemes; a dev build is required for magic links
+  return `${APP_SCHEME}${AUTH_CALLBACK_ROUTE}`; // 'pribrix://auth/verify'
 }
 
 export function getMagicLinkCallbackRoute(url: string) {
