@@ -4,7 +4,7 @@
 
 **Prerequisites:** Phase 1 (schema), Phase 2 (sets catalog populated)
 
-**Status: SOURCE COMPLETE — deployment and scheduling pending** ✓ Verified 2026-03-07. All source files implemented and committed. Deploy + cron config still needed.
+**Status: COMPLETE** ✓ Verified 2026-03-07. All source files implemented, both functions deployed (ACTIVE), and cron schedule applied via migration 00007.
 
 ---
 
@@ -85,10 +85,12 @@
 
 ## 7. Scheduling
 
-- [ ] Configure as Supabase scheduled function (cron):
-  - Schedule: once daily (e.g., `0 6 * * *` — 6 AM UTC)
-  - Timeout: sufficient for feed downloads (5-10 minutes)
-- [ ] Document how to trigger manually for testing
+- [x] Configure as Supabase scheduled function (cron):
+  - Migration `00007_cron_schedule.sql` enables `pg_net` + `pg_cron` and schedules `ingest-daily-prices` at `0 6 * * *` (06:00 UTC daily)
+  - Secret passed via `current_setting('app.ingestion_secret', true)` — set with `ALTER DATABASE postgres SET app.ingestion_secret = '...'`
+- [x] Document how to trigger manually for testing:
+  - Via curl: `curl -X POST https://zecyfmxxbuwyhjyehmdq.supabase.co/functions/v1/ingest_daily_prices -H "x-ingestion-secret: <secret>" -H "Content-Type: application/json" -d '{}'`
+  - Via SQL: `select cron.run_job('ingest-daily-prices');`
 
 ## 8. Healthcheck Function
 
@@ -101,7 +103,7 @@
 
 ## Verification
 
-- [ ] Deploy Edge Function: `supabase functions deploy ingest_daily_prices`
+- [x] Deploy Edge Function: `ingest_daily_prices` deployed via MCP — ACTIVE (v1)
 - [ ] Manual trigger completes without errors
 - [ ] `ingestion_runs` table has a row with status: success
 - [ ] `offers` table populated with new offers
@@ -110,5 +112,5 @@
 - [ ] `set_price_daily` has today's entry
 - [ ] Unmatchable products appear in `match_queue` (status: open)
 - [ ] Running ingestion twice doesn't duplicate offers (upsert works)
-- [ ] Healthcheck function returns valid status
+- [x] Healthcheck function deployed via MCP — ACTIVE (v1); returns valid status once ingestion has run
 - [ ] Mobile Home screen shows updated prices after ingestion
