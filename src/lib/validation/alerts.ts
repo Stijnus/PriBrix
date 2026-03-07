@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { CountryCodeSchema, CountryScopeSchema } from '@/src/types/app';
+
 export const AlertTypeSchema = z.enum([
   'below_base_price',
   'below_delivered_price',
@@ -29,5 +31,16 @@ export const AlertEventSchema = z.object({
   sent_email: z.boolean(),
 });
 
+export const AlertEventHistoryItemSchema = AlertEventSchema.extend({
+  alert_type: AlertTypeSchema,
+  watch_country: CountryScopeSchema,
+  set_num: z.string().trim().min(1),
+  set_name: z.string().trim().min(1),
+  set_image_url: z.string().nullable().optional(),
+  retailer_name: z.string().nullable(),
+  retailer_country: CountryCodeSchema.nullable().optional(),
+});
+
 export type Alert = z.infer<typeof AlertSchema>;
 export type AlertEvent = z.infer<typeof AlertEventSchema>;
+export type AlertEventHistoryItem = z.infer<typeof AlertEventHistoryItemSchema>;

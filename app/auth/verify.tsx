@@ -28,6 +28,7 @@ export default function VerifyScreen() {
     token_hash?: string;
     type?: string;
     code?: string;
+    error?: string;
     error_description?: string;
   }>();
   const [email, setEmail] = useState(getParam(params.email));
@@ -40,8 +41,9 @@ export default function VerifyScreen() {
   const tokenHash = getParam(params.token_hash);
   const authCode = getParam(params.code);
   const authType = getParam(params.type);
+  const authError = getParam(params.error);
   const errorDescription = getParam(params.error_description);
-  const hasCallbackParams = Boolean(accessToken || refreshToken || tokenHash || authCode || errorDescription);
+  const hasCallbackParams = Boolean(accessToken || refreshToken || tokenHash || authCode || authError || errorDescription);
 
   useEffect(() => {
     if (email.length > 0) {
@@ -93,6 +95,12 @@ export default function VerifyScreen() {
         return;
       }
 
+      if (authError) {
+        setStatus('error');
+        setError(getFriendlyError(decodeURIComponent(authError)));
+        return;
+      }
+
       setStatus('verifying');
       setError(null);
 
@@ -126,7 +134,7 @@ export default function VerifyScreen() {
     return () => {
       isCancelled = true;
     };
-  }, [accessToken, authCode, authType, errorDescription, hasCallbackParams, refreshToken, tokenHash]);
+  }, [accessToken, authCode, authError, authType, errorDescription, hasCallbackParams, refreshToken, tokenHash]);
 
   const helperText = useMemo(() => {
     if (status === 'verifying') {

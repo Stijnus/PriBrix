@@ -3,6 +3,8 @@ import { Alert } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
+import { registerPushToken } from '@/src/features/alerts/api';
+import { listenForPushTokenChanges, requestPushToken } from '@/src/features/alerts/utils/pushToken';
 import {
   hasCompletedMigration,
 } from '@/src/lib/storage/authState';
@@ -67,6 +69,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         void queryClient.invalidateQueries({ queryKey: ['server-watchlist'] });
         void queryClient.invalidateQueries({ queryKey: ['server-wishlist'] });
         void queryClient.invalidateQueries({ queryKey: ['server-owned'] });
+        void queryClient.invalidateQueries({ queryKey: ['alert-events'] });
+        void queryClient.invalidateQueries({ queryKey: ['alerts'] });
       }
     });
 
@@ -137,6 +141,50 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       isCancelled = true;
     };
   }, [queryClient, userId]);
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
+    const activeUserId = userId;
+    let isCancelled = false;
+
+    async function syncPushToken() {
+      try {
+        const registration = await requestPushToken();
+
+        if (!registration || isCancelled) {
+          return;
+        }
+
+        await registerPushToken(activeUserId, registration.token, registration.platform);
+      } catch (error) {
+        if (!isCancelled) {
+          console.warn('Push token registration failed.', error);
+        }
+      }
+    }
+
+    void syncPushToken();
+
+    const unsubscribe = listenForPushTokenChanges((registration) => {
+      if (isCancelled) {
+        return;
+      }
+
+      void registerPushToken(activeUserId, registration.token, registration.platform).catch((error) => {
+        if (!isCancelled) {
+          console.warn('Push token refresh registration failed.', error);
+        }
+      });
+    });
+
+    return () => {
+      isCancelled = true;
+      unsubscribe();
+    };
+  }, [userId]);
 
   const value = useMemo<SessionContextValue>(
     () => ({

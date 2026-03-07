@@ -1,18 +1,16 @@
 import { type EmailOtpType, type Session } from '@supabase/supabase-js';
-import * as Linking from 'expo-linking';
 
+import { unregisterPushToken } from '@/src/features/alerts/api';
+import { getMagicLinkRedirectUrl } from '@/src/features/auth/linking';
+import { clearStoredPushToken, getStoredPushToken } from '@/src/features/alerts/utils/pushToken';
 import { clearPendingAuthEmail, setPendingAuthEmail } from '@/src/lib/storage/authState';
 import { supabase } from '@/src/lib/supabase/client';
-
-function getRedirectUrl() {
-  return Linking.createURL('/auth/verify');
-}
 
 export async function signInWithMagicLink(email: string) {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: getRedirectUrl(),
+      emailRedirectTo: getMagicLinkRedirectUrl(),
     },
   });
 
@@ -24,11 +22,23 @@ export async function signInWithMagicLink(email: string) {
 }
 
 export async function signOut() {
+  try {
+    const pushToken = await getStoredPushToken();
+
+    if (pushToken) {
+      await unregisterPushToken(pushToken);
+    }
+  } catch (error) {
+    console.warn('Could not unregister the current push token during sign-out.', error);
+  }
+
   const { error } = await supabase.auth.signOut();
 
   if (error) {
     throw new Error(error.message);
   }
+
+  await clearStoredPushToken();
 }
 
 export async function getSession() {

@@ -14,6 +14,7 @@ import { normalizeBolProducts } from '../_shared/connectors/bol/normalize.ts';
 import { downloadAwinFeed } from '../_shared/connectors/awin/download.ts';
 import { parseAwinFeed } from '../_shared/connectors/awin/parse.ts';
 import { normalizeAwinProducts } from '../_shared/connectors/awin/normalize.ts';
+import { runAlertsAfterIngest } from '../_shared/alerts/runAlerts.ts';
 
 const ACTIVE_OFFER_WINDOW_DAYS = 7;
 const SUPPORTED_COUNTRIES = ['BE', 'NL'] as const;
@@ -364,10 +365,27 @@ Deno.serve(async (request) => {
     }
 
     await refreshCaches(supabase, Array.from(touchedSetIds));
+    let alertResult:
+      | Awaited<ReturnType<typeof runAlertsAfterIngest>>
+      | { error: string }
+      | null = null;
+
+    try {
+      alertResult = await runAlertsAfterIngest(supabase);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown alert evaluation error';
+      logger.error('runAlertsAfterIngest failed at end of ingestion', {
+        error: message,
+      });
+      alertResult = {
+        error: message,
+      };
+    }
 
     return jsonResponse({
       sources: results,
       touched_set_count: touchedSetIds.size,
+      alerts: alertResult,
     });
   } catch (error) {
     logger.error('ingest_daily_prices failed', {

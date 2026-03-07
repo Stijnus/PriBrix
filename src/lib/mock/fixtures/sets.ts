@@ -7,7 +7,7 @@ export const setsFixture: Set[] = [
     name: 'The Lord of the Rings: Rivendell',
     theme: 'Icons',
     year: 2023,
-    image_url: 'https://images.rebrickable.com/media/sets/10316-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/10316-1.jpg',
     msrp_eur: 499.99,
   },
   {
@@ -16,7 +16,7 @@ export const setsFixture: Set[] = [
     name: 'Liebherr Crawler Crane LR 13000',
     theme: 'Technic',
     year: 2023,
-    image_url: 'https://images.rebrickable.com/media/sets/42146-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/42146-1.jpg',
     msrp_eur: 679.99,
   },
   {
@@ -25,7 +25,7 @@ export const setsFixture: Set[] = [
     name: 'The Razor Crest',
     theme: 'Star Wars',
     year: 2022,
-    image_url: 'https://images.rebrickable.com/media/sets/75331-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/75331-1.jpg',
     msrp_eur: 599.99,
   },
   {
@@ -34,7 +34,7 @@ export const setsFixture: Set[] = [
     name: 'Dungeons & Dragons: Red Dragon’s Tale',
     theme: 'Ideas',
     year: 2024,
-    image_url: 'https://images.rebrickable.com/media/sets/21348-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/21348-1.jpg',
     msrp_eur: 359.99,
   },
   {
@@ -43,7 +43,7 @@ export const setsFixture: Set[] = [
     name: 'Avengers Tower',
     theme: 'Marvel Super Heroes',
     year: 2023,
-    image_url: 'https://images.rebrickable.com/media/sets/76269-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/76269-1.jpg',
     msrp_eur: 499.99,
   },
   {
@@ -52,7 +52,7 @@ export const setsFixture: Set[] = [
     name: 'The Mighty Bowser',
     theme: 'Super Mario',
     year: 2022,
-    image_url: 'https://images.rebrickable.com/media/sets/71411-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/71411-1.jpg',
     msrp_eur: 269.99,
   },
   {
@@ -61,7 +61,7 @@ export const setsFixture: Set[] = [
     name: 'Eiffel Tower',
     theme: 'Icons',
     year: 2022,
-    image_url: 'https://images.rebrickable.com/media/sets/10307-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/10307-1.jpg',
     msrp_eur: 629.99,
   },
   {
@@ -70,7 +70,7 @@ export const setsFixture: Set[] = [
     name: 'Space Science Lab',
     theme: 'City',
     year: 2024,
-    image_url: 'https://images.rebrickable.com/media/sets/60439-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/60439-1.jpg',
     msrp_eur: 34.99,
   },
   {
@@ -79,7 +79,7 @@ export const setsFixture: Set[] = [
     name: 'Space Astronaut',
     theme: 'Creator',
     year: 2024,
-    image_url: 'https://images.rebrickable.com/media/sets/31152-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/31152-1.jpg',
     msrp_eur: 49.99,
   },
   {
@@ -88,7 +88,7 @@ export const setsFixture: Set[] = [
     name: 'Andreas Modern Mansion',
     theme: 'Friends',
     year: 2024,
-    image_url: 'https://images.rebrickable.com/media/sets/42639-1.jpg',
+    image_url: 'https://cdn.rebrickable.com/media/sets/42639-1.jpg',
     msrp_eur: 199.99,
   },
 ];

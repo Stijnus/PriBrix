@@ -38,6 +38,28 @@ SELECT id, name, country FROM retailers ORDER BY name;
 
 ---
 
+## Ingestion Pipeline — Switch to Live Data (before production)
+
+**Context:** The pipeline currently runs with `MOCK_FEED=true`. Before going to production, switch to real affiliate feeds so `set_best_prices_daily` is populated with actual retailer prices.
+
+### Step 1 — Trigger mock ingestion now (dev/staging)
+
+Set `MOCK_FEED=true` as a Supabase Edge Function secret and trigger once to populate `set_best_prices_daily` for testing:
+
+```bash
+curl -X POST https://zecyfmxxbuwyhjyehmdq.supabase.co/functions/v1/ingest_daily_prices \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+This makes the home screen browse list functional without real affiliate feeds.
+
+### Step 2 — Switch to real feeds (production)
+
+See **Affiliate Feed Credentials** section below for the full flow.
+
+---
+
 ## Push Notifications (Phase 8)
 
 Price alert push notifications require an Expo push token. Deferred until Phase 8.

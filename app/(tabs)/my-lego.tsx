@@ -117,6 +117,7 @@ export default function MyLegoScreen() {
     ) : (
       <WatchlistList
         items={watchlistEntries}
+        isSignedIn={Boolean(user)}
         onRemove={(item) => void watchlist.removeItem(item)}
       />
     );
