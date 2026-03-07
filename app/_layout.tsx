@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SessionProvider } from '@/src/lib/auth/session';
 import { queryClient } from '@/src/lib/queryClient';
+import { colors } from '@/src/theme/colors';
 
 export default function RootLayout() {
   return (
@@ -18,11 +19,15 @@ export default function RootLayout() {
             screenOptions={{
               headerShown: false,
               contentStyle: {
-                backgroundColor: '#F8FAFC',
+                backgroundColor: colors.neutral[50],
               },
             }}
           >
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="auth/sign-in" />
+            <Stack.Screen name="auth/verify" />
+            <Stack.Screen name="set/[setNum]" />
+            <Stack.Screen name="modal/add-to-list" options={{ presentation: 'modal' }} />
           </Stack>
         </SessionProvider>
       </QueryClientProvider>
