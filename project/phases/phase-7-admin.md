@@ -4,86 +4,64 @@
 
 **Prerequisites:** Phase 6 (ingestion running, match_queue populated)
 
+**Status: COMPLETE** ✓ Verified 2026-03-07. Supabase Studio + SQL helpers approach chosen. Migration 00008 applied. All views and functions deployed. Workflow documented in `docs/admin-workflow.md`.
+
 ---
 
 ## 1. Choose Admin Approach
 
-- [ ] Decision: Next.js admin app (recommended) OR Supabase Studio + SQL procedures
-- [ ] If Next.js:
-  - Create `apps/admin/` or separate repo
-  - Install: Next.js, Supabase client, Tailwind CSS
-  - Configure Supabase service role key (admin-only, never exposed to client)
-- [ ] If Supabase Studio:
-  - Create SQL helper functions/procedures
-  - Document manual workflow using Studio UI
+- [x] Decision: **Supabase Studio + SQL helper views/functions** (no separate app)
+  - Keeps admin surface minimal and outside the mobile project
+  - All views/functions use `security definer` and are revoked from `anon`/`authenticated`
+  - Operator access is via Supabase Studio or service-role SQL only
+  - If a dedicated admin web UI is needed later, these views/functions are the correct backend primitives to reuse
 
 ## 2. Admin Authentication
 
-- [ ] Implement admin-only access:
-  - Option A: Check user email against allowlist
-  - Option B: Add `is_admin` column to `user_plans` or separate admin table
-  - Option C: Use Supabase service role key directly (simplest for single admin)
-- [ ] Protect all admin routes/APIs
+- [x] Implement admin-only access via Supabase Studio (service role):
+  - All admin views and functions have `REVOKE ALL ... FROM anon, authenticated`
+  - No admin logic is exposed to mobile clients
+  - `security definer` on all functions ensures they run with elevated privileges
 
 ## 3. Match Queue Page
 
-- [ ] Build Match Queue list view:
-  - Table columns: source_product_id, title_raw, retailer, EAN, status, created_at
-  - Filter by status: open / resolved / ignored
-  - Filter by retailer
-  - Sort by created_at (newest first)
-  - Pagination
-- [ ] Build Match Queue detail/resolver:
-  - Show full product info (title, EAN, retailer, product URL)
-  - Search sets field: search by set_num or name
-  - "Assign to Set" action:
-    - Set match_queue.status = 'resolved'
-    - Set match_queue.resolved_by + resolved_at
-    - Create `offer_set_overrides` entry (retailer_id + source_product_id -> set_id)
-  - "Ignore" action:
-    - Set status = 'ignored'
-  - Show suggested_set_id if available (from regex partial match)
-- [ ] Batch actions (optional):
-  - Select multiple items -> assign to same set
-  - Select multiple -> ignore
+- [x] `admin_match_queue_view`:
+  - Columns: id, source, source_product_id, title_raw, product_url, ean, status, created_at, resolved_at, retailer_id, retailer_name, retailer_country, suggested_set_id, suggested_set_num, suggested_set_name, resolved_by
+  - Filter by status / retailer via SQL WHERE
+  - Sort by created_at / pagination via LIMIT + OFFSET
+- [x] `admin_resolve_match_queue(queue_id, resolved_set_id, resolved_user_id)`:
+  - Upserts into `offer_set_overrides`
+  - Sets match_queue status = 'resolved', resolved_by, resolved_at
+- [x] `admin_ignore_match_queue(queue_id, resolved_user_id)`:
+  - Sets status = 'ignored'
+- [x] Documented batch patterns in `docs/admin-workflow.md`
 
 ## 4. Override Management
 
-- [ ] Build Overrides list page:
-  - Table: retailer, source_product_id, mapped set_num, created_by, created_at
-  - Search/filter by retailer or set
-  - Delete override (with confirmation)
-- [ ] Verify overrides take effect:
-  - After creating override, next ingestion should auto-map the product
+- [x] `admin_offer_overrides_view`:
+  - Columns: id, retailer_id, retailer_name, retailer_country, source_product_id, set_id, set_num, set_name, created_by, created_at
+  - Filter by retailer / set via SQL WHERE
+- [x] `admin_delete_override(override_id)`:
+  - Deletes the override with existence check
 
 ## 5. Health Dashboard
 
-- [ ] Build Ingestion Health page:
-  - **Last run per source**:
-    - Source name, last run timestamp, status, duration
-    - Offers processed, snapshots inserted
-    - Error message (if failed)
-  - **Overall status indicator**: green/yellow/red
-    - Green: all sources ran successfully within 24h
-    - Yellow: some sources failed or stale (> 24h)
-    - Red: no successful run in 48h
-  - **Ingestion run history**:
-    - Table of recent runs (last 30 days)
-    - Filter by source, status
-- [ ] Build basic stats:
-  - Total sets in catalog
-  - Total active offers
-  - Total match_queue items (open)
-  - Last best_prices_daily refresh timestamp
+- [x] `admin_ingestion_latest_view`:
+  - Latest run per source with duration_seconds and health_color (green/yellow/red)
+  - Green: success within 24h; Yellow: any run within 48h; Red: nothing in 48h
+- [x] `admin_ingestion_history_view`:
+  - Full run history with duration_seconds, orderable/filterable via SQL
+- [x] `admin_dashboard_stats_view`:
+  - total_sets, total_active_offers, open_match_queue_items, last_best_prices_refresh_at
 
 ---
 
 ## Verification
 
-- [ ] Admin UI loads and requires authentication
-- [ ] Match Queue shows unresolved products from ingestion
-- [ ] Assigning a product to a set creates an override
-- [ ] Override persists and next ingestion auto-maps the product
-- [ ] Ignoring a product removes it from the open queue
-- [ ] Health dashboard shows accurate ingestion run data
-- [ ] Non-admin users cannot access admin interface
+- [x] Admin views/functions deployed — migration 00008 applied successfully
+- [x] `admin_match_queue_view` shows unresolved products (populated after ingestion runs)
+- [x] `admin_resolve_match_queue()` creates an override and resolves the queue item
+- [x] Override persists; next ingestion auto-maps the product via `offer_set_overrides`
+- [x] `admin_ignore_match_queue()` moves item out of open queue
+- [x] `admin_ingestion_latest_view` + `admin_dashboard_stats_view` return accurate stats
+- [x] All admin objects revoked from `anon` and `authenticated` — not accessible from mobile
