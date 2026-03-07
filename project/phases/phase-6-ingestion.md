@@ -4,95 +4,84 @@
 
 **Prerequisites:** Phase 1 (schema), Phase 2 (sets catalog populated)
 
+**Status: SOURCE COMPLETE — deployment and scheduling pending** ✓ Verified 2026-03-07. All source files implemented and committed. Deploy + cron config still needed.
+
 ---
 
 ## 1. Shared Edge Function Utilities
 
-- [ ] Create `supabase/functions/_shared/env.ts`:
-  - Read environment variables (feed URLs, API keys, etc.)
-- [ ] Create `supabase/functions/_shared/logger.ts`:
-  - Structured logging helper for Edge Functions
-- [ ] Create `supabase/functions/_shared/types.ts`:
-  - `NormalizedProduct` type: { source_product_id, retailer_id, title, ean, price, shipping, stock_status, product_url }
-  - `IngestionResult` type: { source, offers_processed, snapshots_inserted, errors }
+- [x] Create `supabase/functions/_shared/env.ts`:
+  - Read environment variables (BOL_FEEDS_JSON, AWIN_FEEDS_JSON, INGESTION_SECRET)
+  - Parses typed JSON config arrays for each connector
+- [x] Create `supabase/functions/_shared/logger.ts`:
+  - Structured JSON logger (info/warn/error) with ISO timestamps
+- [x] Create `supabase/functions/_shared/types.ts`:
+  - `NormalizedProduct` type: { source, retailer_id, source_product_id, title, ean, price, shipping, stock_status, product_url }
+  - `IngestionResult` type: { source, offers_processed, snapshots_inserted, matched_products, queued_products, errors }
+  - `BolFeedConfig`, `AwinFeedConfig`, `FeedFieldMap`, `FeedFormat`, `StockStatus`
 
 ## 2. Bol.com Connector
 
-- [ ] Create `supabase/functions/_shared/connectors/bol/download.ts`:
-  - Download bol.com product feed (via affiliate network API or feed URL)
-  - Handle authentication (API key / affiliate credentials)
-  - Return raw feed data (XML/CSV/JSON depending on feed format)
-- [ ] Create `supabase/functions/_shared/connectors/bol/parse.ts`:
-  - Parse raw feed into structured product array
-  - Filter LEGO products only (category filter or keyword match)
-- [ ] Create `supabase/functions/_shared/connectors/bol/normalize.ts`:
-  - Map to `NormalizedProduct` format
-  - Normalize price to EUR numeric
-  - Normalize shipping (null if unknown/free)
-  - Normalize stock status to `in_stock | out_of_stock | unknown`
-  - Set retailer_id from config
+- [x] Create `supabase/functions/_shared/connectors/bol/download.ts`:
+  - Downloads bol.com feed via common `downloadFeed` helper
+  - Returns `{ body, contentType }`
+- [x] Create `supabase/functions/_shared/connectors/bol/parse.ts`:
+  - Parses raw feed into structured records via `parseFeedRecords`
+  - Filters LEGO-only products via `looksLikeLegoProduct`
+- [x] Create `supabase/functions/_shared/connectors/bol/normalize.ts`:
+  - Maps records to `NormalizedProduct` via `normalizeProductFields`
+  - Drops rows missing required fields (id, title, url, price)
+  - Sets retailer_id from config
 
-## 3. Affiliate Network Connector (Awin/Daisycon/TradeTracker)
+## 3. Affiliate Network Connector (Awin)
 
-- [ ] Create `supabase/functions/_shared/connectors/awin/` (or chosen network):
-  - `download.ts` — fetch product feed
-  - `parse.ts` — parse feed format
-  - `normalize.ts` — map to `NormalizedProduct`
-- [ ] Follow same pattern as bol.com connector
-- [ ] Filter for LEGO products
-- [ ] Handle multiple retailers within one network feed
+- [x] Create `supabase/functions/_shared/connectors/awin/download.ts`
+- [x] Create `supabase/functions/_shared/connectors/awin/parse.ts`
+- [x] Create `supabase/functions/_shared/connectors/awin/normalize.ts`
+  - Maps merchant_id → retailer_id via `merchantRetailerMap` config
+  - Drops rows where merchant_id has no retailer mapping
+- [x] Filters for LEGO products (shared `looksLikeLegoProduct`)
+- [x] Handles multiple retailers within one network feed
 
 ## 4. Set Matching / Mapping
 
-- [ ] Create `supabase/functions/_shared/matching/extractSetNum.ts`:
-  - Regex patterns to extract LEGO set number from product title:
-    - Pattern: `(\d{4,6})(-\d+)?` preceded/followed by "LEGO"
-    - Handle variations: "LEGO 75192", "LEGO Set 75192-1", "75192 LEGO Star Wars"
-  - Return extracted set_num or null
-- [ ] Create `supabase/functions/_shared/matching/resolveSetId.ts`:
+- [x] Create `supabase/functions/_shared/matching/extractSetNum.ts`:
+  - 4 regex patterns covering: "LEGO 75192", "LEGO Set 75192-1", "75192 LEGO Star Wars", bare number
+  - Returns `{base}-1` suffix if not present, or null if no match
+- [x] Create `supabase/functions/_shared/matching/resolveSetId.ts`:
   - Mapping priority:
     1. Check `offer_set_overrides` (manual overrides first)
-    2. Extract set_num from title -> look up in `sets`
-    3. Match by EAN if available
+    2. Extract set_num from title → look up in `sets`
+    3. Match by EAN via existing `offers`
     4. If no match: add to `match_queue` (status: open)
-  - Return set_id or null
-- [ ] Create `supabase/functions/_shared/matching/matchQueue.ts`:
-  - `addToMatchQueue(product)` — insert into `match_queue` if not already present
-  - Deduplicate by (retailer_id, source_product_id)
+  - In-memory caches (overrideCache, setNumCache, eanCache) per run to minimise DB round-trips
+- [x] Create `supabase/functions/_shared/matching/matchQueue.ts`:
+  - `addToMatchQueue(product)` — upsert into `match_queue`
+  - Deduplicates by (retailer_id, source_product_id) via `onConflict`
 
 ## 5. Price Processing
 
-- [ ] Create `supabase/functions/_shared/pricing/computeDelivered.ts`:
-  - delivered_price = price + shipping (if shipping known)
-  - If shipping null -> delivered_price = null
-- [ ] Create `supabase/functions/_shared/pricing/normalizeCurrency.ts`:
-  - Ensure price is EUR (all feeds should be EUR for BE/NL)
-  - Strip currency symbols, handle comma/dot decimal separators
+- [x] Create `supabase/functions/_shared/pricing/computeDelivered.ts`:
+  - `delivered_price = price + shipping`; returns null if either is null
+- [x] Create `supabase/functions/_shared/pricing/normalizeCurrency.ts`:
+  - Handles number and string inputs
+  - Strips currency symbols, handles both comma and dot decimal separators
+  - Returns null for non-numeric or infinite values
 
 ## 6. Main Ingestion Function
 
-- [ ] Create `supabase/functions/ingest_daily_prices/index.ts`:
-  - **Step 1**: Log ingestion start in `ingestion_runs` (status: running)
-  - **Step 2**: Run each connector:
-    - Download feed
-    - Parse + filter LEGO
-    - Normalize products
+- [x] Create `supabase/functions/ingest_daily_prices/index.ts`:
+  - Optional `x-ingestion-secret` header guard
+  - **Step 1**: Insert row in `ingestion_runs` (status: running) per source
+  - **Step 2**: Run each bol + awin connector (download → parse → normalize)
   - **Step 3**: For each normalized product:
-    - Resolve set_id (overrides -> regex -> EAN -> match_queue)
-    - If set_id found:
-      - Upsert into `offers` (on conflict: retailer_id + source_product_id)
-      - Update `last_seen_at`
-      - Insert `price_snapshot`
-    - If no match: add to `match_queue`
-  - **Step 4**: Recompute `set_best_prices_daily`:
-    - For each set with new snapshots today:
-      - Find lowest base price per country
-      - Find lowest delivered price per country
-      - Upsert into `set_best_prices_daily`
-  - **Step 5**: Aggregate `set_price_daily`:
-    - For today's date, insert/update daily min prices per set/country
-  - **Step 6**: Log completion in `ingestion_runs` (status: success, counts)
-  - **Error handling**: Catch errors per connector (don't fail entire run if one connector fails), log to `ingestion_runs`
+    - Resolve set_id (overrides → regex → EAN → match_queue)
+    - Upsert into `offers` (on conflict: retailer_id + source_product_id), update `last_seen_at`
+    - Insert `price_snapshot` only if price/shipping/stock changed or no snapshot today
+    - Add to `match_queue` if unresolvable
+  - **Step 4+5**: `refreshCaches` — recompute `set_best_prices_daily` and `set_price_daily` for all touched set_ids
+  - **Step 6**: Finalize `ingestion_runs` row (status: success/error, counts, error_message)
+  - Per-connector error isolation: one connector failure doesn't abort others
 
 ## 7. Scheduling
 
@@ -103,10 +92,10 @@
 
 ## 8. Healthcheck Function
 
-- [ ] Create `supabase/functions/healthcheck/index.ts`:
-  - Query `ingestion_runs` for last run per source
-  - Return JSON: `{ sources: [{ name, last_run, status, offers_processed }] }`
-  - Return overall health status (healthy/degraded/unhealthy)
+- [x] Create `supabase/functions/healthcheck/index.ts`:
+  - Queries `ingestion_runs` for latest row per source
+  - Returns `{ status, sources: [{ name, last_run, status, offers_processed }] }`
+  - Overall status: healthy / degraded / unhealthy based on source statuses
 
 ---
 
