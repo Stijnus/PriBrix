@@ -1,22 +1,36 @@
-import { FontAwesome6 } from '@expo/vector-icons';
+import { Bell, House, Package, Search, Settings2 } from 'lucide-react-native';
 import { Tabs } from 'expo-router';
 
-import { colors } from '@/src/theme/colors';
+import { theme } from '@/src/theme';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary[600],
-        tabBarInactiveTintColor: colors.neutral[400],
+        tabBarActiveTintColor: theme.colors.primary[500],
+        tabBarInactiveTintColor: theme.colors.neutral[400],
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          backgroundColor: colors.neutral[50],
-          borderTopColor: colors.neutral[200],
+          backgroundColor: theme.colors.white,
+          borderTopColor: theme.colors.neutral[200],
+          borderTopWidth: 1,
+          height: 72,
+          paddingTop: 8,
+          paddingBottom: 8,
+          shadowColor: theme.colors.neutral[900],
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.08,
+          shadowRadius: 20,
+          elevation: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '500',
+          fontSize: 10,
+          fontFamily: theme.typography.fontFamilySemiBold,
+          marginTop: 2,
+        },
+        tabBarItemStyle: {
+          paddingVertical: 2,
         },
       }}
     >
@@ -24,35 +38,35 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <FontAwesome6 name="house" size={20} color={color} />,
+          tabBarIcon: ({ color }) => <House color={color} size={22} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           title: 'Search',
-          tabBarIcon: ({ color }) => <FontAwesome6 name="magnifying-glass" size={20} color={color} />,
+          tabBarIcon: ({ color }) => <Search color={color} size={22} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
         name="my-lego"
         options={{
           title: 'My LEGO',
-          tabBarIcon: ({ color }) => <FontAwesome6 name="layer-group" size={20} color={color} />,
+          tabBarIcon: ({ color }) => <Package color={color} size={22} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
         name="alerts"
         options={{
           title: 'Alerts',
-          tabBarIcon: ({ color }) => <FontAwesome6 name="bell" size={20} color={color} />,
+          tabBarIcon: ({ color }) => <Bell color={color} size={22} strokeWidth={2} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color }) => <FontAwesome6 name="gear" size={20} color={color} />,
+          tabBarIcon: ({ color }) => <Settings2 color={color} size={22} strokeWidth={2} />,
         }}
       />
     </Tabs>

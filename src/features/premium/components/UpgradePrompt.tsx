@@ -1,5 +1,7 @@
-import { Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { Text, View } from 'react-native';
+
+import { AppButton } from '@/src/components/ui/AppButton';
 
 type UpgradePromptProps = {
   title: string;
@@ -15,17 +17,18 @@ export function UpgradePrompt({
   reason = 'upgrade_prompt',
 }: UpgradePromptProps) {
   return (
-    <View className="gap-3 rounded-xl bg-primary-50 p-4">
+    <View className="gap-3 rounded-xl border border-primary-100 bg-primary-50 p-5">
       <View className="gap-1">
-        <Text className="text-sm font-semibold uppercase tracking-wide text-primary-600">{title}</Text>
-        <Text className="text-sm text-neutral-600">{description}</Text>
+        <Text className="font-sans-semibold text-xs uppercase tracking-[1px] text-primary-500">
+          {title}
+        </Text>
+        <Text className="font-sans text-sm text-neutral-600">{description}</Text>
       </View>
-      <Pressable
-        className="self-start rounded-lg bg-primary-600 px-4 py-2.5"
-        onPress={() => router.push({ pathname: '/modal/paywall', params: { reason } })}
-      >
-        <Text className="text-sm font-semibold text-white">{ctaLabel}</Text>
-      </Pressable>
+      <View className="self-start">
+        <AppButton size="sm" onPress={() => router.push({ pathname: '/modal/paywall', params: { reason } })}>
+          {ctaLabel}
+        </AppButton>
+      </View>
     </View>
   );
 }

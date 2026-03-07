@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ChevronLeft } from 'lucide-react-native';
 
+import { AppButton } from '@/src/components/ui/AppButton';
 import { completeMagicLinkSignIn, signInWithMagicLink } from '@/src/features/auth/api';
 import { useAuth } from '@/src/features/auth/hooks';
 import { getPendingAuthEmail } from '@/src/lib/storage/authState';
+import { theme } from '@/src/theme';
 
 function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? '' : value ?? '';
@@ -36,6 +40,7 @@ export default function VerifyScreen() {
   const [status, setStatus] = useState<'waiting' | 'verifying' | 'success' | 'error'>('waiting');
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const accessToken = getParam(params.access_token);
   const refreshToken = getParam(params.refresh_token);
   const tokenHash = getParam(params.token_hash);
@@ -170,42 +175,39 @@ export default function VerifyScreen() {
   }
 
   return (
-    <View className="flex-1 gap-6 bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
+    <View
+      className="flex-1 gap-6 bg-neutral-100 px-4 dark:bg-neutral-900"
+      style={{ paddingTop: insets.top + 24 }}
+    >
       <View className="gap-2">
-        <Text className="text-3xl font-bold text-neutral-700 dark:text-neutral-100">Verify sign-in</Text>
-        <Text className="text-base text-neutral-500 dark:text-neutral-400">
+        <Text className="font-sans-semibold text-xs uppercase tracking-[1px] text-primary-500">Account</Text>
+        <Text className="font-sans-extrabold text-3xl text-neutral-900 dark:text-white">Verify sign-in</Text>
+        <Text className="font-sans text-base text-neutral-600 dark:text-neutral-300">
           {email ? `Magic link sent to ${email}.` : 'Magic link sent to your email.'}
         </Text>
       </View>
 
-      <View className="gap-3 rounded-xl bg-white p-4 shadow-sm dark:bg-neutral-800">
+      <View className="gap-3 rounded-xl border border-neutral-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-800">
         <Text
-          className={`text-base ${
+          className={`font-sans text-base ${
             status === 'error' ? 'text-error' : 'text-neutral-600 dark:text-neutral-300'
           }`}
         >
           {helperText}
         </Text>
 
-        <Pressable
-          className={`items-center rounded-lg px-5 py-3 ${
-            secondsRemaining > 0 ? 'bg-neutral-200 dark:bg-neutral-700' : 'bg-primary-600'
-          }`}
+        <AppButton
+          fullWidth
+          variant={secondsRemaining > 0 ? 'secondary' : 'primary'}
           disabled={secondsRemaining > 0}
           onPress={() => void handleResend()}
         >
-          <Text
-            className={`text-base font-semibold ${
-              secondsRemaining > 0 ? 'text-neutral-500 dark:text-neutral-300' : 'text-white'
-            }`}
-          >
-            {secondsRemaining > 0 ? `Resend in ${secondsRemaining}s` : 'Resend magic link'}
-          </Text>
-        </Pressable>
+          {secondsRemaining > 0 ? `Resend in ${secondsRemaining}s` : 'Resend magic link'}
+        </AppButton>
       </View>
 
-      <Pressable className="self-start rounded-lg bg-white px-4 py-2 dark:bg-neutral-800" onPress={() => router.replace('/auth/sign-in')}>
-        <Text className="text-sm font-semibold text-neutral-700 dark:text-neutral-100">Use another email</Text>
+      <Pressable className="h-11 w-11 items-center justify-center rounded-lg bg-white dark:bg-neutral-800" onPress={() => router.replace('/auth/sign-in')}>
+        <ChevronLeft color={theme.colors.neutral[700]} size={20} strokeWidth={2} />
       </Pressable>
     </View>
   );

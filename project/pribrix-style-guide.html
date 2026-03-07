@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PriBrix — Style Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ─── DESIGN TOKENS ─── */
+  :root {
+    /* Brand Colors */
+    --red-500:     #E8192C;
+    --red-400:     #F03345;
+    --red-300:     #FF6B77;
+    --red-100:     #FDE8EA;
+    --red-50:      #FFF5F6;
+
+    /* Neutrals */
+    --gray-900:    #111318;
+    --gray-800:    #1F2330;
+    --gray-700:    #363C4E;
+    --gray-600:    #555C70;
+    --gray-500:    #7C8499;
+    --gray-400:    #A3AABE;
+    --gray-300:    #C8CEDC;
+    --gray-200:    #E4E7F0;
+    --gray-100:    #F0F2F7;
+    --gray-50:     #F7F8FC;
+    --white:       #FFFFFF;
+
+    /* Semantic */
+    --success-600: #1A9E5C;
+    --success-100: #E3F7ED;
+    --warning-600: #D97706;
+    --warning-100: #FEF3C7;
+    --info-600:    #2563EB;
+
+    /* Surface */
+    --bg-app:      #F0F2F7;
+    --bg-card:     #FFFFFF;
+    --bg-elevated: #FFFFFF;
+
+    /* Typography */
+    --font-sans:   'DM Sans', -apple-system, sans-serif;
+    --font-mono:   'DM Mono', monospace;
+
+    /* Spacing (8pt grid) */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 20px;
+    --sp-6: 24px;
+    --sp-8: 32px;
+    --sp-10: 40px;
+    --sp-12: 48px;
+    --sp-16: 64px;
+
+    /* Radius */
+    --r-xs:   4px;
+    --r-sm:   8px;
+    --r-md:   12px;
+    --r-lg:   16px;
+    --r-xl:   20px;
+    --r-2xl:  24px;
+    --r-full: 9999px;
+
+    /* Shadows */
+    --shadow-xs:  0 1px 2px rgba(17,19,24,0.06);
+    --shadow-sm:  0 2px 8px rgba(17,19,24,0.08);
+    --shadow-md:  0 4px 16px rgba(17,19,24,0.10);
+    --shadow-lg:  0 8px 32px rgba(17,19,24,0.12);
+    --shadow-xl:  0 16px 48px rgba(17,19,24,0.16);
+    --shadow-red: 0 8px 24px rgba(232,25,44,0.28);
+  }
+
+  /* ─── BASE ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── LAYOUT ─── */
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--sp-8) var(--sp-6);
+  }
+
+  /* ─── HEADER ─── */
+  .sg-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--sp-16);
+    padding-bottom: var(--sp-8);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .sg-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+  .sg-logo-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--red-500);
+    border-radius: var(--r-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: var(--shadow-red);
+  }
+  .sg-logo-text { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  .sg-logo-text span { color: var(--red-500); }
+  .sg-version { font-size: 12px; font-weight: 500; color: var(--gray-500); font-family: var(--font-mono); margin-top: 6px; }
+
+  /* ─── SECTION ─── */
+  .section {
+    margin-bottom: var(--sp-16);
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-8);
+  }
+  .section-number {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red-500);
+    font-family: var(--font-mono);
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+  }
+  .section-divider {
+    width: 48px;
+    height: 3px;
+    background: var(--red-500);
+    border-radius: var(--r-full);
+    margin-bottom: var(--sp-6);
+  }
+
+  /* ─── GRID LAYOUTS ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sp-4); }
+  @media (max-width: 768px) {
+    .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* ─── TOKEN CARD ─── */
+  .token-card {
+    background: var(--bg-card);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-100);
+  }
+  .token-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    font-family: var(--font-mono);
+    margin-bottom: var(--sp-2);
+  }
+  .token-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-700);
+    font-family: var(--font-mono);
+  }
+
+  /* ─── 1. COLOR PALETTE ─── */
+  .color-swatch {
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-100);
+  }
+  .swatch-main {
+    height: 80px;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--sp-3);
+  }
+  .swatch-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    font-family: var(--font-mono);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .swatch-info {
+    background: var(--white);
+    padding: var(--sp-3) var(--sp-3);
+  }
+  .swatch-name { font-size: 12px; font-weight: 600; color: var(--gray-800); }
+  .swatch-hex { font-size: 11px; color: var(--gray-500); font-family: var(--font-mono); }
+
+  .color-scale {
+    display: flex;
+    gap: 2px;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    height: 48px;
+    margin-bottom: var(--sp-3);
+  }
+  .color-scale-step { flex: 1; }
+
+  /* ─── 2. TYPOGRAPHY ─── */
+  .type-row {
+    background: var(--bg-card);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5) var(--sp-6);
+    border: 1px solid var(--gray-100);
+    margin-bottom: var(--sp-3);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+  .type-meta { font-size: 11px; color: var(--gray-500); font-family: var(--font-mono); line-height: 1.8; }
+  .type-meta strong { color: var(--gray-700); font-weight: 600; }
+
+  /* ─── 3. SPACING ─── */
+  .spacing-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-3);
+    background: var(--bg-card);
+    border-radius: var(--r-md);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--gray-100);
+  }
+  .spacing-bar-wrap { flex: 1; }
+  .spacing-bar {
+    background: var(--red-100);
+    border-left: 3px solid var(--red-500);
+    height: 20px;
+    border-radius: 0 var(--r-xs) var(--r-xs) 0;
+  }
+  .spacing-meta { font-size: 12px; font-family: var(--font-mono); color: var(--gray-600); width: 120px; text-align: right; }
+
+  /* ─── 4. BUTTONS ─── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s ease;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.97); }
+
+  /* Sizes */
+  .btn-xs  { height: 32px; padding: 0 var(--sp-3); font-size: 12px; border-radius: var(--r-sm); }
+  .btn-sm  { height: 40px; padding: 0 var(--sp-4); font-size: 13px; border-radius: var(--r-md); }
+  .btn-md  { height: 48px; padding: 0 var(--sp-6); font-size: 15px; border-radius: var(--r-lg); }
+  .btn-lg  { height: 56px; padding: 0 var(--sp-8); font-size: 16px; border-radius: var(--r-lg); }
+  .btn-full { width: 100%; }
+
+  /* Variants */
+  .btn-primary {
+    background: var(--red-500);
+    color: var(--white);
+    box-shadow: var(--shadow-red);
+  }
+  .btn-primary:hover { background: var(--red-400); box-shadow: 0 10px 28px rgba(232,25,44,0.35); }
+
+  .btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-800);
+  }
+  .btn-secondary:hover { background: var(--gray-200); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--red-500);
+    border: 1.5px solid var(--red-300);
+  }
+  .btn-ghost:hover { background: var(--red-50); }
+
+  .btn-dark {
+    background: var(--gray-900);
+    color: var(--white);
+  }
+  .btn-dark:hover { background: var(--gray-800); }
+
+  .btn-icon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: var(--r-md);
+    font-size: 18px;
+  }
+
+  /* ─── 5. BADGES / CHIPS ─── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-radius: var(--r-full);
+    padding: 3px 10px;
+  }
+  .badge-red    { background: var(--red-500); color: var(--white); }
+  .badge-red-soft { background: var(--red-100); color: var(--red-500); }
+  .badge-success { background: var(--success-100); color: var(--success-600); }
+  .badge-warning { background: var(--warning-100); color: var(--warning-600); }
+  .badge-dark   { background: var(--gray-900); color: var(--white); }
+  .badge-gray   { background: var(--gray-100); color: var(--gray-600); }
+  .badge-outline { background: transparent; color: var(--gray-700); border: 1.5px solid var(--gray-300); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: var(--r-full);
+    padding: var(--sp-2) var(--sp-4);
+    border: 1.5px solid var(--gray-200);
+    background: var(--white);
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip:hover { border-color: var(--red-300); color: var(--red-500); }
+  .chip-active { background: var(--red-500); color: var(--white); border-color: var(--red-500); }
+
+  /* ─── 6. CARDS ─── */
+  .card {
+    background: var(--bg-card);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.8);
+  }
+  .card-padding { padding: var(--sp-5); }
+
+  /* Set Card */
+  .set-card {
+    background: var(--bg-card);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+  .set-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .set-card-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    position: relative;
+  }
+  .set-card-badge {
+    position: absolute;
+    top: var(--sp-3);
+    right: var(--sp-3);
+  }
+  .set-card-body { padding: var(--sp-4); }
+  .set-card-theme {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--red-500);
+    margin-bottom: 2px;
+  }
+  .set-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--sp-3);
+    line-height: 1.3;
+  }
+  .set-card-price { font-size: 18px; font-weight: 800; color: var(--gray-900); }
+  .set-card-old-price {
+    font-size: 12px;
+    text-decoration: line-through;
+    color: var(--gray-400);
+    margin-left: var(--sp-2);
+  }
+  .set-card-saving { font-size: 11px; font-weight: 700; color: var(--success-600); }
+
+  /* Deal Row Card */
+  .deal-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    background: var(--bg-card);
+    border-radius: var(--r-xl);
+    padding: var(--sp-4);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-100);
+    transition: box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .deal-row:hover { box-shadow: var(--shadow-md); }
+  .deal-row-image {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--r-lg);
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .deal-row-content { flex: 1; min-width: 0; }
+  .deal-row-theme {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--red-500);
+  }
+  .deal-row-name { font-size: 14px; font-weight: 700; color: var(--gray-900); }
+  .deal-row-prices { display: flex; align-items: center; gap: var(--sp-2); margin-top: 2px; }
+  .deal-row-price { font-size: 16px; font-weight: 800; color: var(--gray-900); }
+  .deal-row-old { font-size: 12px; text-decoration: line-through; color: var(--gray-400); }
+  .deal-row-saving { font-size: 11px; font-weight: 700; color: var(--success-600); }
+  .sparkline {
+    width: 60px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  /* Retailer Row */
+  .retailer-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    background: var(--bg-card);
+    border-radius: var(--r-lg);
+    padding: var(--sp-4) var(--sp-5);
+    border: 1.5px solid var(--gray-200);
+    transition: all 0.18s;
+    cursor: pointer;
+  }
+  .retailer-row:hover { border-color: var(--red-300); box-shadow: var(--shadow-sm); }
+  .retailer-row.best { border-color: var(--red-500); border-width: 2px; }
+  .retailer-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--r-md);
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .retailer-name { font-size: 14px; font-weight: 700; color: var(--gray-900); }
+  .retailer-tag { font-size: 11px; font-weight: 600; color: var(--success-600); }
+  .retailer-tag-drop { font-size: 11px; font-weight: 600; color: var(--red-500); }
+  .retailer-price { font-size: 18px; font-weight: 800; color: var(--gray-900); margin-left: auto; }
+
+  /* Stat Card */
+  .stat-card {
+    background: var(--bg-card);
+    border-radius: var(--r-xl);
+    padding: var(--sp-5);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-100);
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gray-500);
+    margin-bottom: var(--sp-2);
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--gray-900);
+  }
+  .stat-delta {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--success-600);
+    margin-top: 2px;
+  }
+  .stat-delta.negative { color: var(--red-500); }
+
+  /* Alert CTA Card */
+  .alert-cta-card {
+    background: var(--red-50);
+    border: 1.5px solid var(--red-100);
+    border-radius: var(--r-xl);
+    padding: var(--sp-6);
+    text-align: center;
+  }
+  .alert-cta-icon { font-size: 32px; margin-bottom: var(--sp-3); }
+  .alert-cta-title { font-size: 16px; font-weight: 800; color: var(--gray-900); margin-bottom: var(--sp-2); }
+  .alert-cta-desc { font-size: 13px; color: var(--gray-600); margin-bottom: var(--sp-5); }
+
+  /* ─── 7. INPUTS ─── */
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute;
+    left: var(--sp-4);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 16px;
+    pointer-events: none;
+  }
+  .input {
+    width: 100%;
+    height: 48px;
+    background: var(--gray-100);
+    border: 1.5px solid transparent;
+    border-radius: var(--r-lg);
+    padding: 0 var(--sp-4) 0 var(--sp-10);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--gray-900);
+    outline: none;
+    transition: all 0.18s;
+  }
+  .input::placeholder { color: var(--gray-400); }
+  .input:focus {
+    background: var(--white);
+    border-color: var(--red-400);
+    box-shadow: 0 0 0 3px var(--red-100);
+  }
+  .input-plain {
+    background: var(--gray-100);
+    border: 1.5px solid transparent;
+    border-radius: var(--r-lg);
+    height: 48px;
+    padding: 0 var(--sp-4);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--gray-900);
+    outline: none;
+    transition: all 0.18s;
+    width: 100%;
+  }
+  .input-plain:focus { background: var(--white); border-color: var(--red-400); box-shadow: 0 0 0 3px var(--red-100); }
+
+  /* ─── 8. NAVIGATION ─── */
+  .bottom-nav {
+    background: var(--white);
+    border-top: 1px solid var(--gray-200);
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    padding: var(--sp-3) var(--sp-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    box-shadow: 0 -4px 20px rgba(17,19,24,0.08);
+    max-width: 400px;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--r-md);
+    transition: all 0.15s;
+    min-width: 56px;
+  }
+  .nav-icon { font-size: 22px; }
+  .nav-label { font-size: 10px; font-weight: 600; }
+  .nav-item.active .nav-icon,
+  .nav-item.active .nav-label { color: var(--red-500); }
+  .nav-item:not(.active) .nav-icon,
+  .nav-item:not(.active) .nav-label { color: var(--gray-400); }
+  .nav-fab {
+    width: 52px;
+    height: 52px;
+    background: var(--red-500);
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--white);
+    box-shadow: var(--shadow-red);
+    margin-top: -20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .nav-fab:hover { transform: scale(1.08); }
+
+  /* ─── 9. PROGRESS BAR ─── */
+  .progress-wrap { background: var(--gray-100); border-radius: var(--r-full); overflow: hidden; }
+  .progress-bar {
+    background: linear-gradient(90deg, var(--red-500) 0%, var(--red-400) 100%);
+    border-radius: var(--r-full);
+    transition: width 0.5s ease;
+  }
+  .progress-sm { height: 4px; }
+  .progress-md { height: 8px; }
+  .progress-lg { height: 12px; }
+
+  /* ─── 10. MOTION / SHADOWS ─── */
+  .shadow-demo {
+    background: var(--white);
+    border-radius: var(--r-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    font-family: var(--font-mono);
+  }
+
+  /* ─── 11. RADIUS ─── */
+  .radius-demo {
+    width: 80px;
+    height: 80px;
+    background: var(--red-100);
+    border: 2px solid var(--red-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--red-500);
+    font-family: var(--font-mono);
+  }
+
+  /* ─── ICONS REFERENCE ─── */
+  .icon-grid { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+  .icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    background: var(--white);
+    border-radius: var(--r-lg);
+    padding: var(--sp-4);
+    width: 80px;
+    border: 1px solid var(--gray-100);
+  }
+  .icon-item span:first-child { font-size: 24px; }
+  .icon-item span:last-child { font-size: 10px; color: var(--gray-500); text-align: center; font-weight: 500; }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block {
+    background: var(--gray-900);
+    color: #E8F0FE;
+    border-radius: var(--r-lg);
+    padding: var(--sp-5) var(--sp-6);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-bottom: var(--sp-4);
+  }
+  .code-block .kw { color: #FF7B9C; }
+  .code-block .str { color: #A5D6A7; }
+  .code-block .val { color: #80DEEA; }
+  .code-block .cm { color: #78909C; }
+
+  /* ─── MISC ─── */
+  .flex { display: flex; }
+  .flex-col { flex-direction: column; }
+  .gap-2 { gap: var(--sp-2); }
+  .gap-3 { gap: var(--sp-3); }
+  .gap-4 { gap: var(--sp-4); }
+  .items-center { align-items: center; }
+  .mt-4 { margin-top: var(--sp-4); }
+  .mt-6 { margin-top: var(--sp-6); }
+  .mt-3 { margin-top: var(--sp-3); }
+  .p-note {
+    font-size: 13px;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    border-radius: var(--r-md);
+    padding: var(--sp-3) var(--sp-4);
+    border-left: 3px solid var(--red-400);
+    margin-bottom: var(--sp-4);
+  }
+
+  /* ─── TOGGLE ─── */
+  .toggle-wrap { display: flex; align-items: center; gap: var(--sp-3); }
+  .toggle { width: 44px; height: 24px; background: var(--gray-200); border-radius: var(--r-full); position: relative; cursor: pointer; transition: background 0.2s; }
+  .toggle.on { background: var(--red-500); }
+  .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: var(--white); border-radius: var(--r-full); transition: left 0.2s; box-shadow: var(--shadow-sm); }
+  .toggle.on::after { left: 23px; }
+  .toggle-label { font-size: 14px; font-weight: 500; color: var(--gray-800); }
+
+  /* ─── INLINE SPARKLINE SVG ─── */
+  .spark-up { stroke: #1A9E5C; }
+  .spark-down { stroke: var(--red-400); }
+
+  /* animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .section { animation: fadeUp 0.4s ease both; }
+  .section:nth-child(2) { animation-delay: 0.05s; }
+  .section:nth-child(3) { animation-delay: 0.10s; }
+  .section:nth-child(4) { animation-delay: 0.15s; }
+  .section:nth-child(5) { animation-delay: 0.20s; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="sg-header">
+    <div class="sg-logo">
+      <div class="sg-logo-icon">🧱</div>
+      <div>
+        <div class="sg-logo-text">Pri<span>Brix</span></div>
+        <div class="sg-version">STYLE GUIDE — v1.0.0</div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--gray-500);text-align:right;line-height:1.8;">
+      Benelux LEGO Price Tracker<br>
+      React Native · Expo SDK 54 · TypeScript
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 1. COLOR PALETTE                  -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <span class="section-title">Color Palette</span>
+    </div>
+    <div class="section-divider"></div>
+
+    <p class="p-note">All colors defined as CSS custom properties. In React Native, use the <code>theme/colors.ts</code> constants file. The red brand color dominates; neutrals carry structure; green/yellow are strictly semantic.</p>
+
+    <!-- Brand Red Scale -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Brand Red — Primary</div>
+    <div class="color-scale">
+      <div class="color-scale-step" style="background:#FFF5F6;" title="red-50"></div>
+      <div class="color-scale-step" style="background:#FDE8EA;" title="red-100"></div>
+      <div class="color-scale-step" style="background:#FF6B77;" title="red-300"></div>
+      <div class="color-scale-step" style="background:#F03345;" title="red-400"></div>
+      <div class="color-scale-step" style="background:#E8192C;" title="red-500"></div>
+    </div>
+    <div class="grid-5" style="margin-bottom:var(--sp-8)">
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#FFF5F6;"><span class="swatch-label" style="color:var(--gray-500)">50</span></div>
+        <div class="swatch-info"><div class="swatch-name">red-50</div><div class="swatch-hex">#FFF5F6</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#FDE8EA;"><span class="swatch-label" style="color:var(--red-400)">100</span></div>
+        <div class="swatch-info"><div class="swatch-name">red-100</div><div class="swatch-hex">#FDE8EA</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#FF6B77;"><span class="swatch-label">300</span></div>
+        <div class="swatch-info"><div class="swatch-name">red-300</div><div class="swatch-hex">#FF6B77</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#F03345;"><span class="swatch-label">400</span></div>
+        <div class="swatch-info"><div class="swatch-name">red-400</div><div class="swatch-hex">#F03345</div></div>
+      </div>
+      <div class="color-swatch" style="outline:3px solid var(--red-500);outline-offset:2px;border-radius:var(--r-lg)">
+        <div class="swatch-main" style="background:#E8192C;"><span class="swatch-label">★ 500</span></div>
+        <div class="swatch-info"><div class="swatch-name">red-500 <b style="color:var(--red-500)">(primary)</b></div><div class="swatch-hex">#E8192C</div></div>
+      </div>
+    </div>
+
+    <!-- Neutrals -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Neutral Scale — UI Structure</div>
+    <div class="grid-4" style="margin-bottom:var(--sp-8)">
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#111318;"><span class="swatch-label">gray-900</span></div>
+        <div class="swatch-info"><div class="swatch-name">Headings / body</div><div class="swatch-hex">#111318</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#555C70;"><span class="swatch-label">gray-600</span></div>
+        <div class="swatch-info"><div class="swatch-name">Secondary text</div><div class="swatch-hex">#555C70</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#C8CEDC;"><span class="swatch-label" style="color:var(--gray-600)">gray-300</span></div>
+        <div class="swatch-info"><div class="swatch-name">Borders / dividers</div><div class="swatch-hex">#C8CEDC</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#F0F2F7;"><span class="swatch-label" style="color:var(--gray-500)">gray-100</span></div>
+        <div class="swatch-info"><div class="swatch-name">App background</div><div class="swatch-hex">#F0F2F7</div></div>
+      </div>
+    </div>
+
+    <!-- Semantic -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Semantic Colors</div>
+    <div class="grid-3">
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#1A9E5C;"><span class="swatch-label">Success</span></div>
+        <div class="swatch-info"><div class="swatch-name">Price drops / savings</div><div class="swatch-hex">#1A9E5C</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#D97706;"><span class="swatch-label">Warning</span></div>
+        <div class="swatch-info"><div class="swatch-name">Stock warnings</div><div class="swatch-hex">#D97706</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-main" style="background:#2563EB;"><span class="swatch-label">Info</span></div>
+        <div class="swatch-info"><div class="swatch-name">Info states</div><div class="swatch-hex">#2563EB</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 2. TYPOGRAPHY                     -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <span class="section-title">Typography</span>
+    </div>
+    <div class="section-divider"></div>
+
+    <p class="p-note"><strong>Primary typeface: DM Sans</strong> — geometric, warm, highly legible at small mobile sizes. <strong>Monospace: DM Mono</strong> — used exclusively for prices, codes, and data tokens.</p>
+
+    <div class="type-row">
+      <div class="type-meta"><strong>Display / Hero Price</strong><br>DM Sans 800<br>36–48px / -2px LS<br>Used in stat cards, market price</div>
+      <div style="font-size:42px;font-weight:800;letter-spacing:-2px;color:var(--gray-900)">€129.99</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><strong>Screen Title</strong><br>DM Sans 800<br>28px / -1px LS</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px;">Millennium Falcon</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><strong>Section Heading</strong><br>DM Sans 700<br>20px / -0.5px LS</div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:-0.5px;">Trending Deals</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><strong>Card Title</strong><br>DM Sans 700<br>15px / 0px LS</div>
+      <div style="font-size:15px;font-weight:700;">Ferrari Daytona SP3</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><strong>Body / Description</strong><br>DM Sans 400<br>14px / normal</div>
+      <div style="font-size:14px;font-weight:400;color:var(--gray-600)">Get notified when this set drops below your target price in BE or NL.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><strong>Caption / Tag</strong><br>DM Sans 700<br>11px / +1px LS<br>Uppercase</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red-500)">STAR WARS™ · UCS SERIES</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><strong>Price Data</strong><br>DM Mono 500<br>13–15px<br>Monospace for alignment</div>
+      <div style="font-family:var(--font-mono);font-weight:500;font-size:15px;color:var(--gray-900)">€129.99 &nbsp; <span style="text-decoration:line-through;color:var(--gray-400)">€159.99</span></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><strong>Button Text</strong><br>DM Sans 600<br>13–16px / 0px LS</div>
+      <button class="btn btn-primary btn-md" style="pointer-events:none">Set Price Alert</button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 3. SPACING                        -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <span class="section-title">Spacing System</span>
+    </div>
+    <div class="section-divider"></div>
+    <p class="p-note">8pt base grid. All spacing in React Native uses multiples of 4. Token names map directly to the <code>theme/spacing.ts</code> file.</p>
+
+    <div style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-6);box-shadow:var(--shadow-sm);border:1px solid var(--gray-100)">
+      <div class="spacing-row"><span class="spacing-meta">sp-1 · 4px</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:4px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-2 · 8px</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:8px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-3 · 12px</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:12px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-4 · 16px ★</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:16px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-5 · 20px</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:20px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-6 · 24px ★</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:24px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-8 · 32px</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:32px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-10 · 40px</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:40px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-12 · 48px ★</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:48px"></div></div></div>
+      <div class="spacing-row"><span class="spacing-meta">sp-16 · 64px</span><div class="spacing-bar-wrap"><div class="spacing-bar" style="width:64px"></div></div></div>
+    </div>
+    <p style="font-size:12px;color:var(--gray-500);margin-top:var(--sp-3)">★ Most commonly used values. <br>Screen horizontal padding: <strong>sp-4 (16px)</strong> &nbsp;·&nbsp; Card internal padding: <strong>sp-5 (20px)</strong> &nbsp;·&nbsp; Section gap: <strong>sp-6 (24px)</strong></p>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 4. BORDER RADIUS                  -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <span class="section-title">Border Radius</span>
+    </div>
+    <div class="section-divider"></div>
+    <p class="p-note">PriBrix uses consistently rounded corners. Cards use 20–24px; inputs and buttons use 12–16px; badges and chips use pill (9999px).</p>
+
+    <div class="flex gap-4" style="flex-wrap:wrap;align-items:flex-end">
+      <div style="text-align:center">
+        <div class="radius-demo" style="border-radius:4px">r-xs<br>4px</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;font-family:var(--font-mono)">Icons</div>
+      </div>
+      <div style="text-align:center">
+        <div class="radius-demo" style="border-radius:8px">r-sm<br>8px</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;font-family:var(--font-mono)">Badges</div>
+      </div>
+      <div style="text-align:center">
+        <div class="radius-demo" style="border-radius:12px">r-md<br>12px</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;font-family:var(--font-mono)">Inputs</div>
+      </div>
+      <div style="text-align:center">
+        <div class="radius-demo" style="border-radius:16px">r-lg<br>16px</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;font-family:var(--font-mono)">Buttons</div>
+      </div>
+      <div style="text-align:center">
+        <div class="radius-demo" style="border-radius:20px">r-xl<br>20px</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;font-family:var(--font-mono)">Cards ★</div>
+      </div>
+      <div style="text-align:center">
+        <div class="radius-demo" style="border-radius:24px">r-2xl<br>24px</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;font-family:var(--font-mono)">Sheets</div>
+      </div>
+      <div style="text-align:center">
+        <div class="radius-demo" style="border-radius:9999px;width:80px">r-full</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:4px;font-family:var(--font-mono)">Pills / FAB</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 5. SHADOWS                        -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <span class="section-title">Elevation & Shadows</span>
+    </div>
+    <div class="section-divider"></div>
+    <p class="p-note">React Native uses <code>elevation</code> on Android and <code>shadowColor/Offset/Radius/Opacity</code> on iOS. Shadows use <strong>#111318</strong> as shadow color. The brand red shadow is reserved for CTAs only.</p>
+
+    <div class="grid-3" style="margin-bottom:var(--sp-4)">
+      <div class="shadow-demo" style="box-shadow:var(--shadow-xs)">shadow-xs<br><span style="color:var(--gray-400)">elevation: 1</span></div>
+      <div class="shadow-demo" style="box-shadow:var(--shadow-sm)">shadow-sm<br><span style="color:var(--gray-400)">elevation: 2</span></div>
+      <div class="shadow-demo" style="box-shadow:var(--shadow-md)">shadow-md ★<br><span style="color:var(--gray-400)">elevation: 4</span></div>
+    </div>
+    <div class="grid-3">
+      <div class="shadow-demo" style="box-shadow:var(--shadow-lg)">shadow-lg<br><span style="color:var(--gray-400)">elevation: 8</span></div>
+      <div class="shadow-demo" style="box-shadow:var(--shadow-xl)">shadow-xl<br><span style="color:var(--gray-400)">elevation: 16</span></div>
+      <div class="shadow-demo" style="box-shadow:var(--shadow-red);background:var(--red-50)">shadow-red 🔴<br><span style="color:var(--gray-400)">CTA buttons only</span></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 6. BUTTONS                        -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <span class="section-title">Buttons</span>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="grid-2" style="gap:var(--sp-6)">
+      <div>
+        <div class="token-label" style="margin-bottom:var(--sp-3)">Variants</div>
+        <div style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-6);display:flex;flex-direction:column;gap:var(--sp-3);box-shadow:var(--shadow-sm)">
+          <button class="btn btn-primary btn-md btn-full">Primary — Set Price Alert</button>
+          <button class="btn btn-secondary btn-md btn-full">Secondary — Add to Wishlist</button>
+          <button class="btn btn-ghost btn-md btn-full">Ghost — View All Deals</button>
+          <button class="btn btn-dark btn-md btn-full">Dark — Resume Build</button>
+        </div>
+      </div>
+      <div>
+        <div class="token-label" style="margin-bottom:var(--sp-3)">Sizes</div>
+        <div style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-6);display:flex;flex-direction:column;gap:var(--sp-3);align-items:flex-start;box-shadow:var(--shadow-sm)">
+          <button class="btn btn-primary btn-lg">Large — 56px</button>
+          <button class="btn btn-primary btn-md">Medium — 48px ★</button>
+          <button class="btn btn-primary btn-sm">Small — 40px</button>
+          <button class="btn btn-primary btn-xs">XSmall — 32px</button>
+          <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-2)">
+            <button class="btn btn-primary btn-icon">🛒</button>
+            <button class="btn btn-secondary btn-icon">🔔</button>
+            <button class="btn btn-ghost btn-icon">♡</button>
+            <button class="btn btn-dark btn-icon">←</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 7. BADGES & CHIPS                 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">07</span>
+      <span class="section-title">Badges & Filter Chips</span>
+    </div>
+    <div class="section-divider"></div>
+
+    <div style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-6);box-shadow:var(--shadow-sm)">
+      <div class="token-label" style="margin-bottom:var(--sp-3)">Badges — DM Sans 700, 11px, uppercase, +0.5px LS</div>
+      <div class="flex gap-3" style="flex-wrap:wrap;margin-bottom:var(--sp-6)">
+        <span class="badge badge-red">Best Price</span>
+        <span class="badge badge-red">UCS Series</span>
+        <span class="badge badge-red-soft">Price Drop</span>
+        <span class="badge badge-success">↓ 22% savings</span>
+        <span class="badge badge-warning">Low Stock</span>
+        <span class="badge badge-dark">Premium</span>
+        <span class="badge badge-gray">Out of Stock</span>
+        <span class="badge badge-outline">New</span>
+      </div>
+
+      <div class="token-label" style="margin-bottom:var(--sp-3)">Filter Chips — DM Sans 500, 13px, pill-shaped</div>
+      <div class="flex gap-3" style="flex-wrap:wrap">
+        <span class="chip chip-active">🎯 Themes</span>
+        <span class="chip">📉 Price Drops</span>
+        <span class="chip">✨ New</span>
+        <span class="chip">🇧🇪 BE</span>
+        <span class="chip">🇳🇱 NL</span>
+        <span class="chip">30d</span>
+        <span class="chip chip-active">90d</span>
+        <span class="chip">365d</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 8. INPUTS                         -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">08</span>
+      <span class="section-title">Form Inputs</span>
+    </div>
+    <div class="section-divider"></div>
+
+    <div style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-6);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:var(--sp-4);max-width:480px">
+      <!-- Search -->
+      <div>
+        <div class="token-label" style="margin-bottom:var(--sp-2)">Search Field</div>
+        <div class="input-wrap">
+          <span class="input-icon">🔍</span>
+          <input class="input" placeholder="Search sets, themes, or SKU…">
+        </div>
+      </div>
+      <!-- Text -->
+      <div>
+        <div class="token-label" style="margin-bottom:var(--sp-2)">Text Input</div>
+        <input class="input-plain" placeholder="Enter your email…">
+      </div>
+      <!-- Price Target -->
+      <div>
+        <div class="token-label" style="margin-bottom:var(--sp-2)">Price Target Input</div>
+        <div class="input-wrap">
+          <span class="input-icon" style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--gray-600)">€</span>
+          <input class="input" placeholder="0.00" style="font-family:var(--font-mono)">
+        </div>
+      </div>
+      <!-- Toggle -->
+      <div>
+        <div class="token-label" style="margin-bottom:var(--sp-2)">Toggle</div>
+        <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+          <div class="toggle-wrap">
+            <div class="toggle on"></div>
+            <span class="toggle-label">Show delivered price</span>
+          </div>
+          <div class="toggle-wrap">
+            <div class="toggle"></div>
+            <span class="toggle-label" style="color:var(--gray-400)">Price drop alerts (login required)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 9. CARD COMPONENTS                -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">09</span>
+      <span class="section-title">Card Components</span>
+    </div>
+    <div class="section-divider"></div>
+
+    <!-- Stat Cards -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Stat Cards — Home Screen</div>
+    <div class="grid-3" style="margin-bottom:var(--sp-8)">
+      <div class="stat-card">
+        <div class="stat-label">Total Bricks</div>
+        <div class="stat-value">12,458</div>
+        <div class="stat-delta">↑ +240 this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Collection Value</div>
+        <div class="stat-value">€3,240</div>
+        <div class="stat-delta">↑ +12% YoY</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Market Average</div>
+        <div class="stat-value" style="font-size:24px">€799.99</div>
+        <div class="stat-delta">↑ +4.2% from last month</div>
+      </div>
+    </div>
+
+    <!-- Set Cards (Grid view) -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Set Cards — Grid Browse (2-column on mobile)</div>
+    <div class="grid-3" style="margin-bottom:var(--sp-8)">
+      <div class="set-card">
+        <div class="set-card-image">
+          🏰
+          <div class="set-card-badge"><span class="badge badge-success">↓ 19%</span></div>
+        </div>
+        <div class="set-card-body">
+          <div class="set-card-theme">Icons</div>
+          <div class="set-card-name">Medieval Blacksmith</div>
+          <div>
+            <span class="set-card-price">€144.99</span>
+            <span class="set-card-old-price">€179.99</span>
+          </div>
+          <div class="set-card-saving mt-3">↓ 19% savings</div>
+        </div>
+      </div>
+      <div class="set-card">
+        <div class="set-card-image">
+          🚀
+          <div class="set-card-badge"><span class="badge badge-red">Best Price</span></div>
+        </div>
+        <div class="set-card-body">
+          <div class="set-card-theme">Star Wars™</div>
+          <div class="set-card-name">Millennium Falcon</div>
+          <div>
+            <span class="set-card-price">€129.99</span>
+            <span class="set-card-old-price">€159.99</span>
+          </div>
+          <div class="set-card-saving mt-3">↓ 18% savings</div>
+        </div>
+      </div>
+      <div class="set-card">
+        <div class="set-card-image">
+          🚗
+          <div class="set-card-badge"><span class="badge badge-dark">Technic™</span></div>
+        </div>
+        <div class="set-card-body">
+          <div class="set-card-theme">Technic</div>
+          <div class="set-card-name">Ferrari Daytona SP3</div>
+          <div>
+            <span class="set-card-price">€349.99</span>
+            <span class="set-card-old-price">€449.99</span>
+          </div>
+          <div class="set-card-saving mt-3">↓ 22% savings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deal Row Cards -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Deal Row Cards — List View</div>
+    <div style="max-width:480px;display:flex;flex-direction:column;gap:var(--sp-3);margin-bottom:var(--sp-8)">
+      <div class="deal-row">
+        <div class="deal-row-image">🚀</div>
+        <div class="deal-row-content">
+          <div class="deal-row-theme">Star Wars™</div>
+          <div class="deal-row-name">Millennium Falcon</div>
+          <div class="deal-row-prices">
+            <span class="deal-row-price">€129.99</span>
+            <span class="deal-row-old">€159.99</span>
+            <span class="deal-row-saving">↓ 18%</span>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 60 32">
+          <polyline fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
+            class="spark-up"
+            points="0,28 10,22 20,26 30,18 40,14 50,10 60,6"/>
+        </svg>
+      </div>
+      <div class="deal-row">
+        <div class="deal-row-image">🚗</div>
+        <div class="deal-row-content">
+          <div class="deal-row-theme">Technic™</div>
+          <div class="deal-row-name">Ferrari Daytona SP3</div>
+          <div class="deal-row-prices">
+            <span class="deal-row-price">€349.99</span>
+            <span class="deal-row-old">€449.99</span>
+            <span class="deal-row-saving">↓ 22%</span>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 60 32">
+          <polyline fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
+            class="spark-up"
+            points="0,30 10,28 20,24 30,20 40,16 50,12 60,6"/>
+        </svg>
+      </div>
+      <div class="deal-row">
+        <div class="deal-row-image">🏰</div>
+        <div class="deal-row-content">
+          <div class="deal-row-theme">Icons</div>
+          <div class="deal-row-name">Medieval Blacksmith</div>
+          <div class="deal-row-prices">
+            <span class="deal-row-price">€144.99</span>
+            <span class="deal-row-old">€179.99</span>
+            <span class="deal-row-saving">↓ 19%</span>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 60 32">
+          <polyline fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
+            class="spark-down"
+            points="0,4 10,8 20,6 30,14 40,18 50,22 60,26"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Retailer Rows -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Retailer Price Rows — Set Detail</div>
+    <div style="max-width:480px;display:flex;flex-direction:column;gap:var(--sp-3);margin-bottom:var(--sp-8)">
+      <div class="retailer-row">
+        <div class="retailer-logo">🛍</div>
+        <div>
+          <div class="retailer-name">LEGO Official</div>
+          <div style="font-size:12px;color:var(--gray-500)">In Stock</div>
+        </div>
+        <div class="retailer-price">€849.99</div>
+        <button class="btn btn-ghost btn-sm" style="margin-left:var(--sp-2)">View Deal ↗</button>
+      </div>
+      <div class="retailer-row best">
+        <div class="retailer-logo" style="background:var(--red-50);">🛒</div>
+        <div>
+          <div class="retailer-name">Amazon</div>
+          <div class="retailer-tag-drop">Price Drop!</div>
+        </div>
+        <div class="retailer-price">€789.00</div>
+        <button class="btn btn-primary btn-sm" style="margin-left:var(--sp-2)">Buy Now</button>
+      </div>
+      <div class="retailer-row">
+        <div class="retailer-logo">🏷</div>
+        <div>
+          <div class="retailer-name">bol.com</div>
+          <div style="font-size:12px;color:var(--gray-500)">New · Buy It Now</div>
+        </div>
+        <div class="retailer-price">€815.00</div>
+        <button class="btn btn-ghost btn-sm" style="margin-left:var(--sp-2)">View Deal ↗</button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Progress Bar — Build Tracker</div>
+    <div style="max-width:480px;background:var(--bg-card);padding:var(--sp-5);border-radius:var(--r-xl);box-shadow:var(--shadow-sm);margin-bottom:var(--sp-8)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:var(--sp-2)">
+        <span style="font-size:13px;font-weight:600;color:var(--gray-700)">Progress</span>
+        <span style="font-size:13px;font-weight:700;color:var(--red-500)">64%</span>
+      </div>
+      <div class="progress-wrap progress-md"><div class="progress-bar progress-md" style="width:64%"></div></div>
+    </div>
+
+    <!-- Alert CTA Card -->
+    <div class="token-label" style="margin-bottom:var(--sp-3)">Alert CTA Card — Set Detail Bottom</div>
+    <div style="max-width:480px">
+      <div class="alert-cta-card">
+        <div class="alert-cta-icon">🔔</div>
+        <div class="alert-cta-title">Never miss a price drop</div>
+        <div class="alert-cta-desc">Get instant notifications when this set goes below €790</div>
+        <button class="btn btn-primary btn-lg btn-full">Set Price Alert</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 10. NAVIGATION                    -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">10</span>
+      <span class="section-title">Bottom Navigation</span>
+    </div>
+    <div class="section-divider"></div>
+    <p class="p-note">Tab bar is white with a subtle top border and upward shadow. Active items use red. A central FAB (floating action button) for the primary scan action rises above the bar by 20px.</p>
+
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label">Search</span>
+      </div>
+      <div class="nav-fab">🧱</div>
+      <div class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Build</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </div>
+    </div>
+
+    <div style="margin-top:var(--sp-6);display:flex;gap:var(--sp-4);flex-wrap:wrap">
+      <div class="token-card">
+        <div class="token-label">Height</div>
+        <div class="token-value">64px (+ safe area inset)</div>
+      </div>
+      <div class="token-card">
+        <div class="token-label">Active color</div>
+        <div class="token-value">#E8192C (red-500)</div>
+      </div>
+      <div class="token-card">
+        <div class="token-label">Inactive color</div>
+        <div class="token-value">#A3AABE (gray-400)</div>
+      </div>
+      <div class="token-card">
+        <div class="token-label">FAB size</div>
+        <div class="token-value">52×52px, translateY(-20px)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 11. ICON SYSTEM                   -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">11</span>
+      <span class="section-title">Icon System</span>
+    </div>
+    <div class="section-divider"></div>
+    <p class="p-note">Use <strong>Lucide Icons</strong> (via <code>lucide-react-native</code>) as the primary icon set — consistent stroke width of 2px, size 22–24px for nav and 18–20px for inline. Stroke color inherits from text color.</p>
+
+    <div class="icon-grid">
+      <div class="icon-item"><span>🏠</span><span>home</span></div>
+      <div class="icon-item"><span>🔍</span><span>search</span></div>
+      <div class="icon-item"><span>🔔</span><span>bell</span></div>
+      <div class="icon-item"><span>♡</span><span>heart</span></div>
+      <div class="icon-item"><span>⭐</span><span>star</span></div>
+      <div class="icon-item"><span>📊</span><span>bar-chart</span></div>
+      <div class="icon-item"><span>🛒</span><span>shopping-cart</span></div>
+      <div class="icon-item"><span>↗</span><span>external-link</span></div>
+      <div class="icon-item"><span>←</span><span>chevron-left</span></div>
+      <div class="icon-item"><span>→</span><span>chevron-right</span></div>
+      <div class="icon-item"><span>✕</span><span>x</span></div>
+      <div class="icon-item"><span>✓</span><span>check</span></div>
+      <div class="icon-item"><span>⚙</span><span>settings</span></div>
+      <div class="icon-item"><span>👤</span><span>user</span></div>
+      <div class="icon-item"><span>🏷</span><span>tag</span></div>
+      <div class="icon-item"><span>📦</span><span>package</span></div>
+      <div class="icon-item"><span>🔗</span><span>link</span></div>
+      <div class="icon-item"><span>📱</span><span>smartphone</span></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 12. MOTION                        -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">12</span>
+      <span class="section-title">Motion & Animation</span>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="grid-2">
+      <div style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-6);box-shadow:var(--shadow-sm)">
+        <div class="token-label" style="margin-bottom:var(--sp-4)">Duration Scale</div>
+        <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+          <div class="flex items-center gap-4">
+            <span class="token-value" style="width:80px">80ms</span>
+            <span style="font-size:13px;color:var(--gray-600)">Instant feedback (tap states)</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="token-value" style="width:80px">150ms</span>
+            <span style="font-size:13px;color:var(--gray-600)">Micro-interactions (hover, press)</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="token-value" style="width:80px">200ms ★</span>
+            <span style="font-size:13px;color:var(--gray-600)">Default transitions</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="token-value" style="width:80px">300ms</span>
+            <span style="font-size:13px;color:var(--gray-600)">Card expand, modal appear</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="token-value" style="width:80px">400ms</span>
+            <span style="font-size:13px;color:var(--gray-600)">Page transitions</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="token-value" style="width:80px">500ms</span>
+            <span style="font-size:13px;color:var(--gray-600)">Progress bars, chart draws</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border-radius:var(--r-xl);padding:var(--sp-6);box-shadow:var(--shadow-sm)">
+        <div class="token-label" style="margin-bottom:var(--sp-4)">Easing Curves</div>
+        <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+          <div>
+            <div class="token-value" style="font-size:12px">easeOut — Default</div>
+            <div style="font-size:12px;color:var(--gray-500);font-family:var(--font-mono)">cubic-bezier(0.0, 0.0, 0.2, 1)</div>
+          </div>
+          <div>
+            <div class="token-value" style="font-size:12px">easeInOut — Modals</div>
+            <div style="font-size:12px;color:var(--gray-500);font-family:var(--font-mono)">cubic-bezier(0.4, 0.0, 0.2, 1)</div>
+          </div>
+          <div>
+            <div class="token-value" style="font-size:12px">spring — Card hover lift</div>
+            <div style="font-size:12px;color:var(--gray-500);font-family:var(--font-mono)">Reanimated withSpring()</div>
+          </div>
+        </div>
+        <div class="token-label" style="margin:var(--sp-5) 0 var(--sp-3)">Key Interactions</div>
+        <div style="display:flex;flex-direction:column;gap:var(--sp-2);font-size:13px;color:var(--gray-600)">
+          <div>• Card press → scale(0.97) at 80ms</div>
+          <div>• Card hover → translateY(-3px) + shadow-lg</div>
+          <div>• Button press → scale(0.97)</div>
+          <div>• Skeleton shimmer → 1.5s linear infinite</div>
+          <div>• FAB → scale(1.08) on press</div>
+          <div>• Price change → flash green/red highlight</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 13. THEME TOKENS (CODE)           -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">13</span>
+      <span class="section-title">React Native Theme Tokens</span>
+    </div>
+    <div class="section-divider"></div>
+    <p class="p-note">Copy this into <code>src/theme/index.ts</code> — import <code>theme</code> anywhere in the app. Never use raw hex values in components.</p>
+
+    <div class="code-block">
+<span class="cm">// src/theme/index.ts</span>
+<span class="kw">export const</span> colors = {
+  <span class="cm">// Brand</span>
+  primary:    <span class="str">'#E8192C'</span>,  <span class="cm">// red-500</span>
+  primaryLight: <span class="str">'#FDE8EA'</span>, <span class="cm">// red-100</span>
+  primarySoft: <span class="str">'#FFF5F6'</span>,  <span class="cm">// red-50</span>
+
+  <span class="cm">// Neutrals</span>
+  gray900: <span class="str">'#111318'</span>,
+  gray700: <span class="str">'#363C4E'</span>,
+  gray600: <span class="str">'#555C70'</span>,
+  gray400: <span class="str">'#A3AABE'</span>,
+  gray200: <span class="str">'#E4E7F0'</span>,
+  gray100: <span class="str">'#F0F2F7'</span>,
+  white:   <span class="str">'#FFFFFF'</span>,
+
+  <span class="cm">// Semantic</span>
+  success: <span class="str">'#1A9E5C'</span>,
+  successBg: <span class="str">'#E3F7ED'</span>,
+  warning: <span class="str">'#D97706'</span>,
+
+  <span class="cm">// Surfaces</span>
+  bgApp:  <span class="str">'#F0F2F7'</span>,
+  bgCard: <span class="str">'#FFFFFF'</span>,
+};
+
+<span class="kw">export const</span> spacing = {
+  xs: <span class="val">4</span>, sm: <span class="val">8</span>, md: <span class="val">12</span>,
+  base: <span class="val">16</span>, lg: <span class="val">20</span>, xl: <span class="val">24</span>,
+  xxl: <span class="val">32</span>, xxxl: <span class="val">48</span>,
+};
+
+<span class="kw">export const</span> radius = {
+  xs: <span class="val">4</span>, sm: <span class="val">8</span>, md: <span class="val">12</span>,
+  lg: <span class="val">16</span>, xl: <span class="val">20</span>, xxl: <span class="val">24</span>,
+  full: <span class="val">9999</span>,
+};
+
+<span class="kw">export const</span> typography = {
+  fontFamily: <span class="str">'DMSans'</span>,
+  fontFamilyBold: <span class="str">'DMSans-Bold'</span>,
+  fontFamilyMono: <span class="str">'DMMono'</span>,
+  sizes: {
+    xs: <span class="val">11</span>, sm: <span class="val">12</span>, md: <span class="val">13</span>, base: <span class="val">14</span>,
+    lg: <span class="val">15</span>, xl: <span class="val">16</span>, xxl: <span class="val">20</span>,
+    display: <span class="val">28</span>, hero: <span class="val">42</span>,
+  },
+};
+
+<span class="kw">export const</span> shadow = {
+  sm: {
+    shadowColor: <span class="str">'#111318'</span>, shadowOffset: { width: <span class="val">0</span>, height: <span class="val">2</span> },
+    shadowOpacity: <span class="val">0.08</span>, shadowRadius: <span class="val">8</span>, elevation: <span class="val">2</span>,
+  },
+  md: {
+    shadowColor: <span class="str">'#111318'</span>, shadowOffset: { width: <span class="val">0</span>, height: <span class="val">4</span> },
+    shadowOpacity: <span class="val">0.10</span>, shadowRadius: <span class="val">16</span>, elevation: <span class="val">4</span>,
+  },
+  red: {
+    shadowColor: <span class="str">'#E8192C'</span>, shadowOffset: { width: <span class="val">0</span>, height: <span class="val">8</span> },
+    shadowOpacity: <span class="val">0.28</span>, shadowRadius: <span class="val">24</span>, elevation: <span class="val">8</span>,
+  },
+};
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- 14. DO / DON'T                    -->
+  <!-- ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">14</span>
+      <span class="section-title">Do / Don't</span>
+    </div>
+    <div class="section-divider"></div>
+
+    <div class="grid-2">
+      <div style="background:#E3F7ED;border-radius:var(--r-xl);padding:var(--sp-6);border:1.5px solid #B7E8D0">
+        <div style="font-size:14px;font-weight:800;color:#1A9E5C;margin-bottom:var(--sp-4)">✓ DO</div>
+        <ul style="display:flex;flex-direction:column;gap:var(--sp-3);font-size:13px;color:var(--gray-800);list-style:none">
+          <li>✓ Use <strong>DM Sans</strong> exclusively for all text</li>
+          <li>✓ Use <strong>red-500 (#E8192C)</strong> for all primary CTAs</li>
+          <li>✓ Use <strong>r-xl (20px)</strong> radius on content cards</li>
+          <li>✓ Show savings in <strong>green (#1A9E5C)</strong></li>
+          <li>✓ Use <strong>strikethrough</strong> for original prices</li>
+          <li>✓ Apply red shadow <code>shadow-red</code> to primary buttons</li>
+          <li>✓ Use <strong>uppercase + letter-spacing</strong> for category labels</li>
+          <li>✓ Keep screen horizontal padding at exactly <strong>16px</strong></li>
+          <li>✓ Use skeleton loaders (shimmer) while fetching</li>
+          <li>✓ Show "BEST PRICE" badge on the cheapest retailer row</li>
+        </ul>
+      </div>
+      <div style="background:#FDE8EA;border-radius:var(--r-xl);padding:var(--sp-6);border:1.5px solid #F9B4BA">
+        <div style="font-size:14px;font-weight:800;color:var(--red-500);margin-bottom:var(--sp-4)">✕ DON'T</div>
+        <ul style="display:flex;flex-direction:column;gap:var(--sp-3);font-size:13px;color:var(--gray-800);list-style:none">
+          <li>✕ Never use Inter, Roboto, or system default fonts</li>
+          <li>✕ Don't use purple, blue, or green as primary brand color</li>
+          <li>✕ Don't use sharp corners (0px radius) on cards</li>
+          <li>✕ Never show prices without currency symbol (€)</li>
+          <li>✕ Don't use more than 2 font weights per screen</li>
+          <li>✕ Don't use full-opacity black text on colored backgrounds</li>
+          <li>✕ Never skip the non-affiliation disclaimer in settings</li>
+          <li>✕ Don't use raw hex values in component styles — use theme tokens</li>
+          <li>✕ Don't render more than 20 deal rows without pagination</li>
+          <li>✕ Never call Supabase directly from a UI component</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="text-align:center;padding:var(--sp-8) 0;border-top:1px solid var(--gray-200);margin-top:var(--sp-8)">
+    <div style="font-size:12px;color:var(--gray-400);font-family:var(--font-mono)">
+      PriBrix Style Guide v1.0 · PriBrix is not affiliated with or endorsed by the LEGO Group.
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

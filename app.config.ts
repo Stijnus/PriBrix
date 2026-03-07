@@ -13,10 +13,10 @@ const config: ExpoConfig = {
   splash: {
     image: './assets/images/splash-icon.png',
     resizeMode: 'contain',
-    backgroundColor: '#FFF8F0',
+    backgroundColor: '#FFF5F6',
     dark: {
       image: './assets/images/splash-icon.png',
-      backgroundColor: '#111827',
+      backgroundColor: '#111318',
     },
   },
   ios: {
@@ -30,7 +30,7 @@ const config: ExpoConfig = {
     package: 'com.pribrix.app',
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
-      backgroundColor: '#FFF8F0',
+      backgroundColor: '#FFF5F6',
     },
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,

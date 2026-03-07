@@ -1,4 +1,6 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+
+import { AppButton } from '@/src/components/ui/AppButton';
 
 type EmptyStateProps = {
   title: string;
@@ -9,15 +11,17 @@ type EmptyStateProps = {
 
 export function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
   return (
-    <View className="items-center rounded-xl bg-white px-6 py-10 shadow-sm dark:bg-neutral-800">
-      <Text className="text-xl font-semibold text-neutral-700 dark:text-neutral-100">{title}</Text>
-      <Text className="mt-2 text-center text-base text-neutral-500 dark:text-neutral-400">
+    <View className="items-center rounded-xl border border-neutral-100 bg-white px-6 py-10 shadow-sm dark:border-neutral-800 dark:bg-neutral-800">
+      <Text className="font-sans-bold text-2xl text-neutral-900 dark:text-white">{title}</Text>
+      <Text className="mt-2 text-center font-sans text-base text-neutral-600 dark:text-neutral-300">
         {description}
       </Text>
       {actionLabel && onAction ? (
-        <Pressable className="mt-5 rounded-lg bg-primary-600 px-5 py-3" onPress={onAction}>
-          <Text className="text-base font-semibold text-white">{actionLabel}</Text>
-        </Pressable>
+        <View className="mt-5 w-full">
+          <AppButton fullWidth onPress={onAction}>
+            {actionLabel}
+          </AppButton>
+        </View>
       ) : null}
     </View>
   );

@@ -2,23 +2,80 @@ import '../global.css';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import * as Sentry from '@sentry/react-native';
+import {
+  DMMono_500Medium,
+} from '@expo-google-fonts/dm-mono';
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+  DMSans_800ExtraBold,
+} from '@expo-google-fonts/dm-sans';
 import * as Linking from 'expo-linking';
-import * as Notifications from 'expo-notifications';
+import { useFonts } from 'expo-font';
 import { Stack, useRouter } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Text, TextInput } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { getMagicLinkCallbackRoute } from '@/src/features/auth/linking';
 import { SessionProvider } from '@/src/lib/auth/session';
 import { initSentry } from '@/src/lib/monitoring/sentry';
 import { queryClient } from '@/src/lib/queryClient';
-import { colors } from '@/src/theme/colors';
+import { theme } from '@/src/theme';
 
 initSentry();
+void SplashScreen.preventAutoHideAsync();
 
-if (Platform.OS !== 'web') {
+let defaultsApplied = false;
+let notificationHandlerConfigured = false;
+let notificationsModulePromise: Promise<typeof import('expo-notifications') | null> | null = null;
+
+function applyTypographyDefaults() {
+  if (defaultsApplied) {
+    return;
+  }
+
+  const textComponent = Text as typeof Text & { defaultProps?: { style?: unknown } };
+  const textInputComponent = TextInput as typeof TextInput & { defaultProps?: { style?: unknown } };
+  const textStyle = { fontFamily: theme.typography.fontFamily };
+
+  textComponent.defaultProps = {
+    ...textComponent.defaultProps,
+    style: textComponent.defaultProps?.style ? [textStyle, textComponent.defaultProps.style] : textStyle,
+  };
+  textInputComponent.defaultProps = {
+    ...textInputComponent.defaultProps,
+    style: textInputComponent.defaultProps?.style
+      ? [textStyle, textInputComponent.defaultProps.style]
+      : textStyle,
+  };
+
+  defaultsApplied = true;
+}
+
+async function loadNotificationsModule() {
+  if (Platform.OS === 'web') {
+    return null;
+  }
+
+  if (!notificationsModulePromise) {
+    notificationsModulePromise = import('expo-notifications');
+  }
+
+  return notificationsModulePromise;
+}
+
+async function ensureNotificationHandler() {
+  const Notifications = await loadNotificationsModule();
+
+  if (!Notifications || notificationHandlerConfigured) {
+    return Notifications;
+  }
+
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldPlaySound: false,
@@ -27,6 +84,9 @@ if (Platform.OS !== 'web') {
       shouldShowList: true,
     }),
   });
+
+  notificationHandlerConfigured = true;
+  return Notifications;
 }
 
 function NotificationNavigation() {
@@ -34,11 +94,7 @@ function NotificationNavigation() {
   const lastNotificationIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      return;
-    }
-
-    function handleResponse(response: Notifications.NotificationResponse | null) {
+    function handleResponse(response: import('expo-notifications').NotificationResponse | null) {
       if (!response) {
         return;
       }
@@ -64,16 +120,36 @@ function NotificationNavigation() {
       }
     }
 
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      handleResponse(response);
-    });
+    let isCancelled = false;
+    let removeSubscription = () => {};
 
-    void Notifications.getLastNotificationResponseAsync().then((response) => {
-      handleResponse(response);
-    });
+    async function setupNotifications() {
+      const Notifications = await ensureNotificationHandler();
+
+      if (!Notifications || isCancelled) {
+        return;
+      }
+
+      const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+        handleResponse(response);
+      });
+
+      removeSubscription = () => {
+        subscription.remove();
+      };
+
+      void Notifications.getLastNotificationResponseAsync().then((response) => {
+        if (!isCancelled) {
+          handleResponse(response);
+        }
+      });
+    }
+
+    void setupNotifications();
 
     return () => {
-      subscription.remove();
+      isCancelled = true;
+      removeSubscription();
     };
   }, [router]);
 
@@ -117,6 +193,28 @@ function AuthCallbackNavigation() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
+    DMSans_800ExtraBold,
+    DMMono_500Medium,
+  });
+
+  useEffect(() => {
+    if (!fontsLoaded && !fontError) {
+      return;
+    }
+
+    applyTypographyDefaults();
+    void SplashScreen.hideAsync();
+  }, [fontError, fontsLoaded]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <Sentry.ErrorBoundary fallback={<StatusBar style="auto" />}>
       <SafeAreaProvider>
@@ -129,7 +227,7 @@ export default function RootLayout() {
               screenOptions={{
                 headerShown: false,
                 contentStyle: {
-                  backgroundColor: colors.neutral[50],
+                  backgroundColor: theme.colors.bgApp,
                 },
               }}
             >

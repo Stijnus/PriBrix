@@ -4,8 +4,13 @@ import { useMockMode } from '@/src/hooks/useMockMode';
 import { type CountryCode, type CountryScope } from '@/src/types/app';
 import { isClientRuntime } from '@/src/utils/runtime';
 
-import { fetchBestPricesDaily, fetchSetDetail, fetchSetSummary } from './api';
-import type { SetSort } from './types';
+import {
+  fetchBestPricesDaily,
+  fetchSetDetail,
+  fetchSetSummary,
+  fetchSetsWithBestPricesBySetNums,
+} from './api';
+import type { SetSort, SetWithBestPrice } from './types';
 
 const PAGE_SIZE = 12;
 
@@ -50,5 +55,18 @@ export function useSetSummary(setNum: string) {
     queryKey: ['set-summary', setNum, isMockMode],
     queryFn: () => fetchSetSummary(setNum, isMockMode),
     enabled: clientRuntime && setNum.length > 0,
+  });
+}
+
+export function useSetsWithBestPrices(setNums: string[], enabled = true) {
+  const { isMockMode } = useMockMode();
+  const clientRuntime = isClientRuntime();
+  const stableSetNums = Array.from(new Set(setNums));
+
+  return useQuery({
+    queryKey: ['sets-with-best-prices', stableSetNums.join(','), isMockMode],
+    queryFn: () => fetchSetsWithBestPricesBySetNums(stableSetNums, isMockMode),
+    enabled: clientRuntime && enabled && stableSetNums.length > 0,
+    initialData: [] as SetWithBestPrice[],
   });
 }

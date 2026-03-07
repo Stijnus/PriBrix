@@ -332,6 +332,37 @@ export async function fetchSetsBySetNums(setNums: string[], preferMock = false):
   return uniqueSetNums.map((setNum) => setMap.get(setNum)).filter(Boolean) as Set[];
 }
 
+export async function fetchSetsWithBestPricesBySetNums(
+  setNums: string[],
+  preferMock = false,
+): Promise<SetWithBestPrice[]> {
+  if (setNums.length === 0) {
+    return [];
+  }
+
+  const uniqueSetNums = Array.from(new Set(setNums));
+
+  if (preferMock || !hasSupabaseConfig) {
+    const fixtureMap = new Map(setsFixture.map((set) => [set.set_num, buildMockSetWithBestPrices(set)]));
+    return uniqueSetNums.map((setNum) => fixtureMap.get(setNum)).filter(Boolean) as SetWithBestPrice[];
+  }
+
+  const sets = await fetchSetsBySetNums(uniqueSetNums);
+  const bestPrices = await fetchBestPricesBySetIds(sets.map((set) => set.id));
+  const priceMap = buildBestPriceMapBySetId(bestPrices);
+  const setMap = new Map(
+    sets.map((set) => [
+      set.set_num,
+      {
+        ...set,
+        bestPriceByCountry: buildBestPriceMap(priceMap.get(set.id) ?? []),
+      } satisfies SetWithBestPrice,
+    ]),
+  );
+
+  return uniqueSetNums.map((setNum) => setMap.get(setNum)).filter(Boolean) as SetWithBestPrice[];
+}
+
 export async function fetchSetSummary(setNum: string, preferMock = false) {
   const [set] = await fetchSetsBySetNums([setNum], preferMock);
   return set ?? null;

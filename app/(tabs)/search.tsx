@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { FlatList, Text, TextInput, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Search, Sparkles } from 'lucide-react-native';
 
+import { AppSearchInput } from '@/src/components/ui/AppSearchInput';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { ErrorState } from '@/src/components/ui/ErrorState';
 import { LoadingSkeleton } from '@/src/components/ui/LoadingSkeleton';
 import { SetCard } from '@/src/features/sets/components/SetCard';
 import { useSearchSets } from '@/src/features/search/hooks';
 import { trackSearchPerformed } from '@/src/lib/analytics/events';
-import { colors } from '@/src/theme/colors';
+import { theme } from '@/src/theme';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
@@ -18,6 +21,7 @@ export default function SearchScreen() {
     bestPriceByCountry: {},
   }));
   const lastTrackedKey = useRef<string | null>(null);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (search.debouncedQuery.length === 0 || search.isLoading || search.isError) {
@@ -36,29 +40,54 @@ export default function SearchScreen() {
 
   return (
     <FlatList
-      className="flex-1 bg-neutral-50 dark:bg-neutral-900"
-      contentContainerClassName="gap-4 px-4 py-6"
+      className="flex-1 bg-neutral-100 dark:bg-neutral-900"
+      contentContainerClassName="gap-4 px-4"
+      contentContainerStyle={{ paddingTop: insets.top + 24, paddingBottom: 24 }}
       data={items}
       keyExtractor={(item) => item.id}
       keyboardShouldPersistTaps="handled"
+      removeClippedSubviews
+      maxToRenderPerBatch={8}
+      windowSize={5}
       renderItem={({ item }) => (
         <SetCard item={item} onPress={() => router.push(`/set/${item.set_num}`)} />
       )}
       ListHeaderComponent={
-        <View className="gap-4">
+        <View className="gap-6">
           <View className="gap-2">
-            <Text className="text-2xl font-bold text-neutral-700 dark:text-neutral-100">Search</Text>
-            <Text className="text-base text-neutral-500 dark:text-neutral-400">
+            <Text className="font-sans-semibold text-xs uppercase tracking-[1px] text-primary-500">
+              Search
+            </Text>
+            <Text className="font-sans-extrabold text-3xl text-neutral-900 dark:text-white">
+              Find any LEGO set
+            </Text>
+            <Text className="font-sans text-base text-neutral-600 dark:text-neutral-300">
               Search for a LEGO set by name or number.
             </Text>
           </View>
-          <TextInput
+
+          <AppSearchInput
             value={query}
             onChangeText={setQuery}
-            placeholder="Search for a LEGO set by name or number"
-            placeholderTextColor={colors.neutral[400]}
-            className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+            placeholder="Search sets, themes, or SKU…"
+            autoFocus={false}
           />
+
+          {query.trim().length > 0 ? (
+            <View className="flex-row items-center gap-2">
+              <Sparkles color={theme.colors.primary[500]} size={18} strokeWidth={2} />
+              <Text className="font-sans-bold text-xl text-neutral-900 dark:text-white">
+                Results
+              </Text>
+            </View>
+          ) : (
+            <View className="flex-row items-center gap-2">
+              <Search color={theme.colors.neutral[500]} size={18} strokeWidth={2} />
+              <Text className="font-sans-medium text-sm text-neutral-600 dark:text-neutral-300">
+                Search stays anonymous until you choose to sign in.
+              </Text>
+            </View>
+          )}
         </View>
       }
       ListEmptyComponent={

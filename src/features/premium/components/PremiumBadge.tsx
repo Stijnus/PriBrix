@@ -9,18 +9,18 @@ type PremiumBadgeProps = {
 export function PremiumBadge({ label = 'Premium', interactive = true }: PremiumBadgeProps) {
   if (!interactive) {
     return (
-      <View className="self-start rounded-full bg-primary-100 px-2 py-0.5">
-        <Text className="text-xs font-medium text-primary-700">{label}</Text>
+      <View className="self-start rounded-full bg-neutral-900 px-2.5 py-1">
+        <Text className="font-sans-bold text-xs uppercase tracking-[0.5px] text-white">{label}</Text>
       </View>
     );
   }
 
   return (
     <Pressable
-      className="self-start rounded-full bg-primary-100 px-2 py-0.5"
+      className="self-start rounded-full bg-neutral-900 px-2.5 py-1"
       onPress={() => router.push('/modal/paywall')}
     >
-      <Text className="text-xs font-medium text-primary-700">{label}</Text>
+      <Text className="font-sans-bold text-xs uppercase tracking-[0.5px] text-white">{label}</Text>
     </Pressable>
   );
 }

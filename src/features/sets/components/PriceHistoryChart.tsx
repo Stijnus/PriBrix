@@ -66,13 +66,13 @@ export function PriceHistoryChart({
   const chartWidth = Math.max(240, width - 88);
 
   return (
-    <View className="gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-neutral-800">
+    <View className="gap-4 rounded-xl border border-neutral-100 bg-white p-5 shadow-md dark:border-neutral-800 dark:bg-neutral-800">
       <View className="flex-row items-center justify-between">
-        <Text className="text-xl font-semibold text-neutral-700 dark:text-neutral-100">Price history</Text>
+        <Text className="font-sans-bold text-2xl text-neutral-900 dark:text-white">Price history</Text>
         <Badge label={isLoading ? 'Updating' : 'Live'} variant={isLoading ? 'country' : 'premium'} />
       </View>
 
-      <View className="flex-row gap-2">
+      <View className="flex-row gap-3">
         {periods.map((period) => {
           const isLocked = maxHistoryDays === 30 && period.value !== 30;
 
@@ -80,10 +80,10 @@ export function PriceHistoryChart({
             <Pressable
               key={period.value}
               className={classes(
-                'rounded-full px-3 py-1.5 text-sm',
+                'rounded-full border px-4 py-2',
                 period.value === selectedHistoryDays
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-300',
+                  ? 'border-primary-500 bg-primary-500 text-white'
+                  : 'border-neutral-200 bg-white text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300',
                 isLocked && 'opacity-80',
               )}
               onPress={() =>
@@ -94,8 +94,8 @@ export function PriceHistoryChart({
                 <Text
                   className={
                     period.value === selectedHistoryDays
-                      ? 'text-sm font-medium text-primary-700'
-                      : 'text-sm font-medium text-neutral-500 dark:text-neutral-300'
+                      ? 'font-sans-medium text-sm text-white'
+                      : 'font-sans-medium text-sm text-neutral-500 dark:text-neutral-300'
                   }
                 >
                   {period.label}
@@ -108,20 +108,24 @@ export function PriceHistoryChart({
       </View>
 
       {isLoading && data.length === 0 ? (
-        <Text className="text-base text-neutral-500 dark:text-neutral-400">Loading history…</Text>
+        <Text className="font-sans text-base text-neutral-500 dark:text-neutral-400">Loading history…</Text>
       ) : !hasBaseData && !hasDeliveredData ? (
-        <Text className="text-base text-neutral-500 dark:text-neutral-400">Not enough history data yet</Text>
+        <Text className="font-sans text-base text-neutral-500 dark:text-neutral-400">
+          Not enough history data yet
+        </Text>
       ) : (
         <View className="gap-3">
           <View className="flex-row gap-3">
             <View className="flex-row items-center gap-2">
               <View className="h-2.5 w-2.5 rounded-full bg-accent-500" />
-              <Text className="text-sm text-neutral-500 dark:text-neutral-400">Base</Text>
+              <Text className="font-sans text-sm text-neutral-500 dark:text-neutral-400">Base</Text>
             </View>
             {hasDeliveredData ? (
               <View className="flex-row items-center gap-2">
                 <View className="h-2.5 w-2.5 rounded-full bg-primary-500" />
-                <Text className="text-sm text-neutral-500 dark:text-neutral-400">Delivered</Text>
+                <Text className="font-sans text-sm text-neutral-500 dark:text-neutral-400">
+                  Delivered
+                </Text>
               </View>
             ) : null}
           </View>
@@ -158,8 +162,12 @@ export function PriceHistoryChart({
             rulesColor={colors.neutral[200]}
             textColor1={colors.neutral[500]}
             textColor2={colors.neutral[500]}
-            yAxisTextStyle={{ color: colors.neutral[500] }}
-            xAxisLabelTextStyle={{ color: colors.neutral[500], fontSize: 11 }}
+            yAxisTextStyle={{ color: colors.neutral[500], fontFamily: 'DMMono_500Medium' }}
+            xAxisLabelTextStyle={{
+              color: colors.neutral[500],
+              fontSize: 11,
+              fontFamily: 'DMSans_500Medium',
+            }}
             textShiftY={8}
             noOfSections={4}
             formatYLabel={(label) => `€${Math.round(Number(label))}`}
@@ -178,14 +186,14 @@ export function PriceHistoryChart({
 
                 return (
                   <View className="gap-1 rounded-lg border border-neutral-200 bg-white px-3 py-2 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
-                    <Text className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    <Text className="font-sans-semibold text-xs uppercase tracking-[1px] text-neutral-400">
                       {baseItem?.dateLabel ?? ''}
                     </Text>
-                    <Text className="text-sm font-medium text-accent-600">
+                    <Text className="font-sans-medium text-sm text-accent-600">
                       Base {formatPrice(baseItem?.value ?? null)}
                     </Text>
                     {hasDeliveredData ? (
-                      <Text className="text-sm font-medium text-primary-600">
+                      <Text className="font-sans-medium text-sm text-primary-600">
                         Delivered {formatPrice(deliveredItem?.value ?? null)}
                       </Text>
                     ) : null}

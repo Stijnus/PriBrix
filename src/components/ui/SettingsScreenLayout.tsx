@@ -1,5 +1,9 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ChevronLeft } from 'lucide-react-native';
+
+import { theme } from '@/src/theme';
 
 type SettingsScreenLayoutProps = {
   title: string;
@@ -12,23 +16,26 @@ export function SettingsScreenLayout({
   description,
   children,
 }: SettingsScreenLayoutProps) {
+  const insets = useSafeAreaInsets();
+
   return (
     <ScrollView
-      className="flex-1 bg-neutral-50 dark:bg-neutral-900"
-      contentContainerClassName="gap-6 px-4 py-6"
+      className="flex-1 bg-neutral-100 dark:bg-neutral-900"
+      contentContainerClassName="gap-6 px-4"
+      contentContainerStyle={{ paddingTop: insets.top + 24, paddingBottom: 24 }}
     >
       <View className="flex-row items-start justify-between gap-4">
         <View className="flex-1 gap-2">
-          <Text className="text-2xl font-bold text-neutral-700 dark:text-neutral-100">{title}</Text>
+          <Text className="font-sans-extrabold text-3xl text-neutral-900 dark:text-white">{title}</Text>
           {description ? (
-            <Text className="text-base text-neutral-500 dark:text-neutral-400">{description}</Text>
+            <Text className="font-sans text-base text-neutral-600 dark:text-neutral-300">{description}</Text>
           ) : null}
         </View>
         <Pressable
-          className="rounded-lg bg-white px-4 py-2 dark:bg-neutral-800"
+          className="h-11 w-11 items-center justify-center rounded-lg bg-white dark:bg-neutral-800"
           onPress={() => router.back()}
         >
-          <Text className="text-sm font-semibold text-neutral-700 dark:text-neutral-100">Back</Text>
+          <ChevronLeft color={theme.colors.neutral[700]} size={20} strokeWidth={2} />
         </Pressable>
       </View>
 

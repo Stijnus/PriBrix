@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import { storageKeys } from '@/src/lib/storage/keys';
@@ -10,8 +9,22 @@ export type PushRegistration = {
   platform: 'ios' | 'android';
 };
 
+let notificationsModulePromise: Promise<typeof import('expo-notifications') | null> | null = null;
+
 function getPlatform(): PushRegistration['platform'] {
   return Platform.OS === 'android' ? 'android' : 'ios';
+}
+
+async function loadNotificationsModule() {
+  if (Platform.OS === 'web') {
+    return null;
+  }
+
+  if (!notificationsModulePromise) {
+    notificationsModulePromise = import('expo-notifications');
+  }
+
+  return notificationsModulePromise;
 }
 
 export async function getStoredPushToken() {
@@ -27,7 +40,9 @@ async function storePushToken(token: string) {
 }
 
 export async function requestPushToken(): Promise<PushRegistration | null> {
-  if (Platform.OS === 'web') {
+  const Notifications = await loadNotificationsModule();
+
+  if (!Notifications) {
     return null;
   }
 
@@ -73,15 +88,35 @@ export function listenForPushTokenChanges(
     return () => {};
   }
 
-  const subscription = Notifications.addPushTokenListener((token) => {
-    void storePushToken(token.data);
-    onToken({
-      token: token.data,
-      platform: getPlatform(),
+  let isCancelled = false;
+  let removeSubscription = () => {};
+
+  void loadNotificationsModule()
+    .then((Notifications) => {
+      if (!Notifications || isCancelled) {
+        return;
+      }
+
+      const subscription = Notifications.addPushTokenListener((token) => {
+        void storePushToken(token.data);
+        onToken({
+          token: token.data,
+          platform: getPlatform(),
+        });
+      });
+
+      removeSubscription = () => {
+        subscription.remove();
+      };
+    })
+    .catch((error) => {
+      if (!isCancelled) {
+        console.warn('Could not listen for push token changes.', error);
+      }
     });
-  });
 
   return () => {
-    subscription.remove();
+    isCancelled = true;
+    removeSubscription();
   };
 }

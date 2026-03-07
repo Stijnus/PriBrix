@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { ChevronLeft } from 'lucide-react-native';
 
+import { AppButton } from '@/src/components/ui/AppButton';
+import { AppChip } from '@/src/components/ui/AppChip';
 import { ErrorState } from '@/src/components/ui/ErrorState';
 import { LoadingSkeleton } from '@/src/components/ui/LoadingSkeleton';
 import { useAuth } from '@/src/features/auth/hooks';
@@ -13,6 +16,7 @@ import { useWishlist } from '@/src/features/wishlist/hooks';
 import { usePreferences } from '@/src/hooks/usePreferences';
 import { trackWatchAdded } from '@/src/lib/analytics/events';
 import { colors } from '@/src/theme/colors';
+import { theme } from '@/src/theme';
 
 const modes = ['watchlist', 'wishlist', 'owned'] as const;
 const conditions = ['sealed', 'used', 'incomplete'] as const;
@@ -48,7 +52,7 @@ export default function AddToListModal() {
 
   if (summary.isLoading) {
     return (
-      <View className="flex-1 bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
+      <View className="flex-1 bg-neutral-100 px-4 py-6 dark:bg-neutral-900">
         <LoadingSkeleton count={2} compact />
       </View>
     );
@@ -56,7 +60,7 @@ export default function AddToListModal() {
 
   if (summary.isError || !summary.data) {
     return (
-      <View className="flex-1 bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
+      <View className="flex-1 bg-neutral-100 px-4 py-6 dark:bg-neutral-900">
         <ErrorState description="PriBrix could not load this set for list actions." />
       </View>
     );
@@ -122,66 +126,56 @@ export default function AddToListModal() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-neutral-50 dark:bg-neutral-900" contentContainerClassName="gap-6 px-4 py-6">
+    <ScrollView className="flex-1 bg-neutral-100 dark:bg-neutral-900" contentContainerClassName="gap-6 px-4 py-6">
       <View className="flex-row items-center justify-between">
-        <Text className="text-2xl font-bold text-neutral-700 dark:text-neutral-100">Add to list</Text>
-        <Pressable className="rounded-lg bg-white px-4 py-2 dark:bg-neutral-800" onPress={() => router.back()}>
-          <Text className="text-sm font-semibold text-neutral-700 dark:text-neutral-100">Close</Text>
+        <Text className="font-sans-extrabold text-3xl text-neutral-900 dark:text-white">Add to list</Text>
+        <Pressable className="h-11 w-11 items-center justify-center rounded-lg bg-white dark:bg-neutral-800" onPress={() => router.back()}>
+          <ChevronLeft color={theme.colors.neutral[700]} size={20} strokeWidth={2} />
         </Pressable>
       </View>
 
-      <View className="gap-1 rounded-xl bg-white p-4 shadow-sm dark:bg-neutral-800">
-        <Text className="text-base font-semibold text-neutral-700 dark:text-neutral-100">{setSummary.name}</Text>
-        <Text className="text-sm text-neutral-400">{setSummary.set_num}</Text>
+      <View className="gap-1 rounded-xl border border-neutral-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-800">
+        <Text className="font-sans-bold text-lg text-neutral-900 dark:text-white">{setSummary.name}</Text>
+        <Text className="font-mono text-sm text-neutral-500">{setSummary.set_num}</Text>
       </View>
 
-      <View className="flex-row flex-wrap gap-2">
+      <View className="flex-row flex-wrap gap-3">
         {modes.map((entryMode) => (
-          <Text
+          <AppChip
             key={entryMode}
-            className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-              mode === entryMode
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-white text-neutral-500 dark:bg-neutral-800 dark:text-neutral-300'
-            }`}
-            onPress={() => setMode(entryMode)}
-          >
-            {entryMode === 'owned'
+            label={entryMode === 'owned'
               ? 'Collection'
               : entryMode.charAt(0).toUpperCase() + entryMode.slice(1)}
-          </Text>
+            active={mode === entryMode}
+            onPress={() => setMode(entryMode)}
+          />
         ))}
       </View>
 
       {mode === 'watchlist' ? (
-        <View className="gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-neutral-800">
-          <Text className="text-base font-semibold text-neutral-700 dark:text-neutral-100">Watch settings</Text>
+        <View className="gap-4 rounded-xl border border-neutral-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-800">
+          <Text className="font-sans-bold text-lg text-neutral-900 dark:text-white">Watch settings</Text>
           {!user ? (
-            <Pressable className="rounded-lg bg-primary-50 p-3" onPress={() => router.push('/auth/sign-in')}>
-              <Text className="text-sm font-semibold text-primary-600">Create an account to enable synced alerts</Text>
-              <Text className="mt-1 text-sm text-neutral-600">
+            <Pressable className="rounded-lg border border-primary-100 bg-primary-50 p-3" onPress={() => router.push('/auth/sign-in')}>
+              <Text className="font-sans-semibold text-sm text-primary-500">Create an account to enable synced alerts</Text>
+              <Text className="mt-1 font-sans text-sm text-neutral-600">
                 You can save this watch locally now, then sign in to sync it across devices.
               </Text>
             </Pressable>
           ) : null}
-          <Text className="text-sm text-neutral-500 dark:text-neutral-400">
+          <Text className="font-sans text-sm text-neutral-500 dark:text-neutral-400">
             {entitlements.watchlistLimit == null
               ? `${watchlist.items.length} watch slots used · Unlimited on Premium`
               : `${watchlist.items.length} / ${entitlements.watchlistLimit} watch slots used`}
           </Text>
           <View className="flex-row gap-2">
             {(['BE', 'NL', '*'] as const).map((value) => (
-              <Text
+              <AppChip
                 key={value}
-                className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-                  country === value
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-300'
-                }`}
+                label={value}
+                active={country === value}
                 onPress={() => setCountry(value)}
-              >
-                {value}
-              </Text>
+              />
             ))}
           </View>
           <TextInput
@@ -190,27 +184,22 @@ export default function AddToListModal() {
             keyboardType="numeric"
             placeholder="Target base price (optional)"
             placeholderTextColor={colors.neutral[400]}
-            className="rounded-lg border border-neutral-200 bg-neutral-100 px-4 py-3 text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+            className="rounded-lg border border-neutral-200 bg-neutral-100 px-4 py-3 font-mono text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
           />
         </View>
       ) : null}
 
       {mode === 'wishlist' ? (
-        <View className="gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-neutral-800">
-          <Text className="text-base font-semibold text-neutral-700 dark:text-neutral-100">Wishlist settings</Text>
+        <View className="gap-4 rounded-xl border border-neutral-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-800">
+          <Text className="font-sans-bold text-lg text-neutral-900 dark:text-white">Wishlist settings</Text>
           <View className="flex-row gap-2">
             {priorities.map((value) => (
-              <Text
+              <AppChip
                 key={value}
-                className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-                  priority === value
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-300'
-                }`}
+                label={value}
+                active={priority === value}
                 onPress={() => setPriority(value)}
-              >
-                {value}
-              </Text>
+              />
             ))}
           </View>
           <TextInput
@@ -219,43 +208,38 @@ export default function AddToListModal() {
             keyboardType="numeric"
             placeholder="Target base price (optional)"
             placeholderTextColor={colors.neutral[400]}
-            className="rounded-lg border border-neutral-200 bg-neutral-100 px-4 py-3 text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+            className="rounded-lg border border-neutral-200 bg-neutral-100 px-4 py-3 font-mono text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
           />
         </View>
       ) : null}
 
       {mode === 'owned' ? (
-        <View className="gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-neutral-800">
-          <Text className="text-base font-semibold text-neutral-700 dark:text-neutral-100">Collection settings</Text>
+        <View className="gap-4 rounded-xl border border-neutral-100 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-800">
+          <Text className="font-sans-bold text-lg text-neutral-900 dark:text-white">Collection settings</Text>
           <TextInput
             value={quantity}
             onChangeText={setQuantity}
             keyboardType="number-pad"
             placeholder="Quantity"
             placeholderTextColor={colors.neutral[400]}
-            className="rounded-lg border border-neutral-200 bg-neutral-100 px-4 py-3 text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+            className="rounded-lg border border-neutral-200 bg-neutral-100 px-4 py-3 font-mono text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
           />
           <View className="flex-row gap-2">
             {conditions.map((value) => (
-              <Text
+              <AppChip
                 key={value}
-                className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-                  condition === value
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-300'
-                }`}
+                label={value}
+                active={condition === value}
                 onPress={() => setCondition(value)}
-              >
-                {value}
-              </Text>
+              />
             ))}
           </View>
         </View>
       ) : null}
 
-      <Pressable className="items-center rounded-lg bg-primary-600 px-5 py-3" onPress={() => void handleSave()}>
-        <Text className="text-base font-semibold text-white">{user ? 'Save to account' : 'Save locally'}</Text>
-      </Pressable>
+      <AppButton fullWidth onPress={() => void handleSave()}>
+        {user ? 'Save to account' : 'Save locally'}
+      </AppButton>
     </ScrollView>
   );
 }
