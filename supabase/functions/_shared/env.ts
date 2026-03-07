@@ -44,6 +44,10 @@ export function getIngestionSecret() {
   return getEnv('INGESTION_SECRET');
 }
 
+export function getMockFeedEnabled() {
+  return getEnv('MOCK_FEED').toLowerCase() === 'true';
+}
+
 export function getBolFeedConfigs(): BolFeedConfig[] {
   const configs = parseJsonEnv<Array<Record<string, unknown>>>('BOL_FEEDS_JSON', []);
 

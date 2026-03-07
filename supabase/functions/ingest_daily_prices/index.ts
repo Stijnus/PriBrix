@@ -1,7 +1,8 @@
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
-import { getAwinFeedConfigs, getBolFeedConfigs, getIngestionSecret } from '../_shared/env.ts';
+import { getAwinFeedConfigs, getBolFeedConfigs, getIngestionSecret, getMockFeedEnabled } from '../_shared/env.ts';
+import { generateMockProducts } from '../_shared/connectors/mock/generate.ts';
 import { logger } from '../_shared/logger.ts';
 import { resolveSetId } from '../_shared/matching/resolveSetId.ts';
 import { computeDelivered } from '../_shared/pricing/computeDelivered.ts';
@@ -352,6 +353,13 @@ Deno.serve(async (request) => {
           const parsed = parseAwinFeed(download.body, download.contentType, config);
           return normalizeAwinProducts(parsed, config);
         }, touchedSetIds),
+      );
+    }
+
+    if (getMockFeedEnabled()) {
+      logger.info('MOCK_FEED=true — running mock connector instead of real feeds');
+      results.push(
+        await runSource(supabase, 'mock', () => generateMockProducts(supabase), touchedSetIds),
       );
     }
 
