@@ -10,7 +10,7 @@ const retailerIds = {
 
 export const offersFixture: Offer[] = setsFixture.flatMap((set, index) => [
   {
-    id: `${String(index + 1).padStart(12, '0')}-c593-4d8a-a9f1-000000000001`,
+    id: `${String(index + 1).padStart(8, '0')}-c593-4d8a-a9f1-000000000001`,
     retailer_id: retailerIds.lego,
     set_id: set.id,
     source_product_id: `lego-${set.set_num}`,
@@ -19,7 +19,7 @@ export const offersFixture: Offer[] = setsFixture.flatMap((set, index) => [
     title_raw: `${set.name} ${set.set_num}`,
   },
   {
-    id: `${String(index + 1).padStart(12, '0')}-c593-4d8a-a9f1-000000000002`,
+    id: `${String(index + 1).padStart(8, '0')}-c593-4d8a-a9f1-000000000002`,
     retailer_id: retailerIds.bol,
     set_id: set.id,
     source_product_id: `bol-${set.set_num}`,
@@ -28,7 +28,7 @@ export const offersFixture: Offer[] = setsFixture.flatMap((set, index) => [
     title_raw: `LEGO ${set.name} ${set.set_num}`,
   },
   {
-    id: `${String(index + 1).padStart(12, '0')}-c593-4d8a-a9f1-000000000003`,
+    id: `${String(index + 1).padStart(8, '0')}-c593-4d8a-a9f1-000000000003`,
     retailer_id: retailerIds.amazon,
     set_id: set.id,
     source_product_id: `amazon-${set.set_num}`,

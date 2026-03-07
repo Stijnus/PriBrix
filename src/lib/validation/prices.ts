@@ -21,6 +21,18 @@ export const BestPriceDailySchema = z.object({
   updated_at: z.string().datetime(),
 });
 
+export const BestPriceSummarySchema = z.object({
+  best_base_price: z.number().nonnegative().nullable(),
+  best_base_offer_id: z.string().uuid().nullable(),
+  best_delivered_price: z.number().nonnegative().nullable(),
+  best_delivered_offer_id: z.string().uuid().nullable(),
+});
+
+export const BestPricesByCountrySchema = z.object({
+  BE: BestPriceSummarySchema.optional(),
+  NL: BestPriceSummarySchema.optional(),
+});
+
 export const PriceHistoryPointSchema = z.object({
   date: z.string().date(),
   min_base_price: z.number().nonnegative().nullable(),
@@ -29,4 +41,5 @@ export const PriceHistoryPointSchema = z.object({
 
 export type PriceSnapshot = z.infer<typeof PriceSnapshotSchema>;
 export type BestPriceDaily = z.infer<typeof BestPriceDailySchema>;
+export type BestPriceSummary = z.infer<typeof BestPriceSummarySchema>;
 export type PriceHistoryPoint = z.infer<typeof PriceHistoryPointSchema>;

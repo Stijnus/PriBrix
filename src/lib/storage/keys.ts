@@ -3,4 +3,6 @@ export const storageKeys = {
   localWishlist: 'local_wishlist',
   localOwned: 'local_owned',
   userPreferences: 'user_preferences',
+  pendingAuthEmail: 'pending_auth_email',
+  migrationCompletedPrefix: 'migration_completed',
 } as const;

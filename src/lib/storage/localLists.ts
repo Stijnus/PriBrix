@@ -53,3 +53,11 @@ export async function getLocalOwned(): Promise<LocalOwnedItem[]> {
 export async function setLocalOwned(items: LocalOwnedItem[]) {
   await writeJson(storageKeys.localOwned, LocalOwnedItemArraySchema.parse(items));
 }
+
+export async function clearLocalLists() {
+  await Promise.all([
+    AsyncStorage.removeItem(storageKeys.localWatchlist),
+    AsyncStorage.removeItem(storageKeys.localWishlist),
+    AsyncStorage.removeItem(storageKeys.localOwned),
+  ]);
+}

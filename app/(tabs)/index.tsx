@@ -1,59 +1,112 @@
-import { ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { FlatList, Pressable, Text, View } from 'react-native';
+import { router } from 'expo-router';
 
-import { setsFixture } from '@/src/lib/mock/fixtures/sets';
-import { useMockMode } from '@/src/hooks/useMockMode';
-import { formatPrice } from '@/src/utils/formatPrice';
+import { EmptyState } from '@/src/components/ui/EmptyState';
+import { ErrorState } from '@/src/components/ui/ErrorState';
+import { LoadingSkeleton } from '@/src/components/ui/LoadingSkeleton';
+import { usePreferences } from '@/src/hooks/usePreferences';
+import { SetCard } from '@/src/features/sets/components/SetCard';
+import { useBestPricesDaily } from '@/src/features/sets/hooks';
+import type { SetSort } from '@/src/features/sets/types';
 
-const featuredSets = setsFixture.slice(0, 3);
+const sortOptions: { label: string; value: SetSort }[] = [
+  { label: 'Lowest price', value: 'lowest-price' },
+  { label: 'Newest', value: 'newest' },
+  { label: 'Theme', value: 'theme' },
+];
 
 export default function HomeScreen() {
-  const { isMockMode, environment } = useMockMode();
+  const [sort, setSort] = useState<SetSort>('lowest-price');
+  const { preferences } = usePreferences();
+  const query = useBestPricesDaily(preferences.country, sort);
+  const items = query.data?.pages.flatMap((page) => page.items) ?? [];
+
+  if (query.isLoading) {
+    return (
+      <View className="flex-1 bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
+        <LoadingSkeleton count={4} />
+      </View>
+    );
+  }
+
+  if (query.isError) {
+    return (
+      <View className="flex-1 bg-neutral-50 px-4 py-6 dark:bg-neutral-900">
+        <ErrorState
+          description="PriBrix could not load the browse catalog right now."
+          onRetry={() => query.refetch()}
+        />
+      </View>
+    );
+  }
 
   return (
-    <ScrollView className="flex-1 bg-neutral-50 dark:bg-neutral-900" contentContainerClassName="gap-6 px-4 py-6">
-      <View className="gap-2">
-        <Text className="text-sm font-semibold uppercase tracking-wide text-primary-600">
-          PriBrix
-        </Text>
-        <Text className="text-3xl font-bold text-neutral-700 dark:text-neutral-100">
-          Anonymous-first LEGO price tracking for BE and NL.
-        </Text>
-        <Text className="text-base text-neutral-500 dark:text-neutral-400">
-          Phase 0 is live: Expo Router, NativeWind, Supabase wiring, mock data, and project tooling are in place.
-        </Text>
-      </View>
-
-      <View className="rounded-xl bg-primary-50 p-4 dark:bg-neutral-800">
-        <Text className="text-sm font-medium text-primary-700">
-          Environment: {environment.toUpperCase()}
-        </Text>
-        <Text className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-          Mock mode is {isMockMode ? 'enabled' : 'disabled'}.
-        </Text>
-      </View>
-
-      <View className="gap-3">
-        <Text className="text-xl font-semibold text-neutral-700 dark:text-neutral-100">
-          Featured placeholders
-        </Text>
-        {featuredSets.map((set) => (
-          <View
-            key={set.id}
-            className="flex-row items-center justify-between rounded-xl bg-white p-3 shadow-sm dark:bg-neutral-800"
-          >
-            <View className="mr-4 flex-1 gap-1">
-              <Text className="text-base font-semibold text-neutral-700 dark:text-neutral-100">
-                {set.name}
-              </Text>
-              <Text className="text-xs text-neutral-400">{set.set_num}</Text>
-              <Text className="text-xs text-neutral-500 dark:text-neutral-400">{set.theme}</Text>
-            </View>
-            <Text className="text-lg font-bold text-neutral-800 dark:text-neutral-50">
-              {formatPrice(set.msrp_eur, 'nl-BE')}
+    <FlatList
+      className="flex-1 bg-neutral-50 dark:bg-neutral-900"
+      contentContainerClassName="gap-4 px-4 py-6"
+      data={items}
+      keyExtractor={(item) => item.id}
+      onRefresh={() => query.refetch()}
+      refreshing={query.isRefetching}
+      renderItem={({ item }) => (
+        <SetCard item={item} onPress={() => router.push(`/set/${item.set_num}`)} />
+      )}
+      ListHeaderComponent={
+        <View className="gap-4">
+          <View className="gap-2">
+            <Text className="text-sm font-semibold uppercase tracking-wide text-primary-600">Browse</Text>
+            <Text className="text-3xl font-bold text-neutral-700 dark:text-neutral-100">
+              Best LEGO prices in {preferences.country}
+            </Text>
+            <Text className="text-base text-neutral-500 dark:text-neutral-400">
+              Anonymous users can browse, search, and manage local lists before sign-in.
             </Text>
           </View>
-        ))}
-      </View>
-    </ScrollView>
+
+          <View className="flex-row flex-wrap gap-2">
+            {sortOptions.map((option) => (
+              <Pressable
+                key={option.value}
+                className={`rounded-full px-3 py-1.5 ${
+                  sort === option.value
+                    ? 'bg-primary-100'
+                    : 'bg-white dark:bg-neutral-800'
+                }`}
+                onPress={() => setSort(option.value)}
+              >
+                <Text
+                  className={`text-sm font-medium ${
+                    sort === option.value
+                      ? 'text-primary-700'
+                      : 'text-neutral-500 dark:text-neutral-300'
+                  }`}
+                >
+                  {option.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      }
+      ListEmptyComponent={
+        <EmptyState
+          title="No prices available yet"
+          description="Catalog data is present, but price ingestion has not populated the browse cache yet."
+        />
+      }
+      ListFooterComponent={
+        query.hasNextPage ? (
+          <Pressable
+            className="mt-2 rounded-lg bg-neutral-100 px-5 py-3 dark:bg-neutral-800"
+            onPress={() => query.fetchNextPage()}
+          >
+            <Text className="text-center text-base font-semibold text-neutral-700 dark:text-neutral-100">
+              {query.isFetchingNextPage ? 'Loading…' : 'Load more'}
+            </Text>
+          </Pressable>
+        ) : null
+      }
+    />
   );
 }

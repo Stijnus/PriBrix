@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+import { OfferWithLatestSchema } from '@/src/lib/validation/offers';
+import { BestPricesByCountrySchema, PriceHistoryPointSchema } from '@/src/lib/validation/prices';
+
 export const SetSchema = z.object({
   id: z.string().uuid(),
   set_num: z.string().trim().min(1),
@@ -10,4 +13,12 @@ export const SetSchema = z.object({
   msrp_eur: z.number().nonnegative().nullable(),
 });
 
+export const SetDetailFunctionResponseSchema = z.object({
+  set: SetSchema,
+  offers: z.array(OfferWithLatestSchema),
+  best_prices: BestPricesByCountrySchema,
+  price_history: z.array(PriceHistoryPointSchema),
+});
+
 export type Set = z.infer<typeof SetSchema>;
+export type SetDetailFunctionResponse = z.infer<typeof SetDetailFunctionResponseSchema>;

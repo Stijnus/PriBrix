@@ -1,29 +1,69 @@
-import { ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { FlatList, Text, TextInput, View } from 'react-native';
+import { router } from 'expo-router';
 
-import { setsFixture } from '@/src/lib/mock/fixtures/sets';
+import { EmptyState } from '@/src/components/ui/EmptyState';
+import { ErrorState } from '@/src/components/ui/ErrorState';
+import { LoadingSkeleton } from '@/src/components/ui/LoadingSkeleton';
+import { SetCard } from '@/src/features/sets/components/SetCard';
+import { useSearchSets } from '@/src/features/search/hooks';
+import { colors } from '@/src/theme/colors';
 
 export default function SearchScreen() {
+  const [query, setQuery] = useState('');
+  const search = useSearchSets(query);
+  const items = (search.data ?? []).map((set) => ({
+    ...set,
+    bestPriceByCountry: {},
+  }));
+
   return (
-    <ScrollView className="flex-1 bg-neutral-50 dark:bg-neutral-900" contentContainerClassName="gap-6 px-4 py-6">
-      <View className="gap-2">
-        <Text className="text-2xl font-bold text-neutral-700 dark:text-neutral-100">Search</Text>
-        <Text className="text-base text-neutral-500 dark:text-neutral-400">
-          Phase 0 ships a placeholder search surface. Real catalog querying arrives in Phase 3 after the Supabase schema and catalog import are ready.
-        </Text>
-      </View>
-
-      <View className="rounded-lg border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-700 dark:bg-neutral-800">
-        <Text className="text-base text-neutral-400">Search for a LEGO set by name or number</Text>
-      </View>
-
-      <View className="gap-3">
-        {setsFixture.slice(0, 5).map((set) => (
-          <View key={set.id} className="rounded-xl bg-white p-3 shadow-sm dark:bg-neutral-800">
-            <Text className="text-base font-semibold text-neutral-700 dark:text-neutral-100">{set.name}</Text>
-            <Text className="text-xs text-neutral-400">{set.set_num}</Text>
+    <FlatList
+      className="flex-1 bg-neutral-50 dark:bg-neutral-900"
+      contentContainerClassName="gap-4 px-4 py-6"
+      data={items}
+      keyExtractor={(item) => item.id}
+      keyboardShouldPersistTaps="handled"
+      renderItem={({ item }) => (
+        <SetCard item={item} onPress={() => router.push(`/set/${item.set_num}`)} />
+      )}
+      ListHeaderComponent={
+        <View className="gap-4">
+          <View className="gap-2">
+            <Text className="text-2xl font-bold text-neutral-700 dark:text-neutral-100">Search</Text>
+            <Text className="text-base text-neutral-500 dark:text-neutral-400">
+              Search for a LEGO set by name or number.
+            </Text>
           </View>
-        ))}
-      </View>
-    </ScrollView>
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search for a LEGO set by name or number"
+            placeholderTextColor={colors.neutral[400]}
+            className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-base text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+          />
+        </View>
+      }
+      ListEmptyComponent={
+        query.trim().length === 0 ? (
+          <EmptyState
+            title="Search for a LEGO set"
+            description="Type a set number like 75192-1 or part of a name to search the catalog."
+          />
+        ) : search.isLoading ? (
+          <LoadingSkeleton count={4} compact />
+        ) : search.isError ? (
+          <ErrorState
+            description="PriBrix could not search the catalog right now."
+            onRetry={() => search.refetch()}
+          />
+        ) : (
+          <EmptyState
+            title="No sets found"
+            description={`No sets found for "${search.debouncedQuery}".`}
+          />
+        )
+      }
+    />
   );
 }
